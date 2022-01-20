@@ -36,10 +36,6 @@ class TestDependencies(unittest.TestCase):
         msg += " or $MINIMAP2_PATH"
         assert which(BINARIES["minimap2"]), msg
 
-
-    
-
-
 if __name__ == "__main__":
     unittest.main()
 
