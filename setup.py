@@ -1,9 +1,9 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 from os.path import join, dirname
 
 setup(
-    name='organelle_PBA',
+    name='OPBA2',
     version='1.0',
-    packages=find_packages(),
-    long_description=open(join(dirname(__file__), 'README.txt')).read(),
+    packages=["orgpba2"],
+    long_description=open(join(dirname(__file__), 'README.md')).read(),
 )
