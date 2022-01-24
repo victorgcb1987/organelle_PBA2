@@ -1,13 +1,13 @@
 from os import environ as env
-from os.path import (exists, join)
+from pathlib import Path
 from shutil import which
 
 
-def check_binary_in_user_envs(user_env):
+def check_executable_in_user_envs(user_env):
     #This function checks if user has defined a path
     #for program needed to run orgpba2
     program = list(user_env.keys())[0]
-    binaries = user_env[program]["binaries"]
+    executables = user_env[program]["executables"]
     user_path = user_env[program]["user_path"]
 
     #Try to find if variable is user_path is defined
@@ -17,35 +17,31 @@ def check_binary_in_user_envs(user_env):
         msg = "user env {} is not defined for {}"
         print(msg.format(user_path, program))
         return False
-    #If user_path is defined, try to find all binaries
+    #If user_path is defined, try to find all executables
     #needed to run the program
     else:
-        for binary in binaries:
-            full_path = join(user_path_check, binary)
-            check = exists(full_path)
+        for executable in executables:
+            executable = Path(executable)
+            full_path = user_path_check / executable
+            check = full_path.exists()
             if not check:
-               msg = "{} doesn't contain {} binary"
-               print(msg.format(user_path_check, binary))
+               msg = "{} doesn't contain {} executable"
+               print(msg.format(user_path_check, executable))
                return False
             else:
-                print("{} found at {}".format(binary, full_path))
+                print("{} found at {}".format(executable, full_path))
     return True
 
-def check_is_binary_is_in_PATH(binaries):
+def check_is_executable_is_in_PATH(executables):
     msg = "{} is not defined in $PATH."
     msg += " {} path must be set either in $PATH"
     msg += " or set in user env path"
-    for binary in binaries:
-        check = which(binary)
+    for executable in executables:
+        check = which(executable)
         if check:
-            print("{} found at {}".format(binary, check))
+            print("{} found at {}".format(executable, check))
         else:
-            print(msg.format(binary, binary))
+            print(msg.format(executable, executable))
             return False
     return True
-
-# def check_binary_requirements(binaries=BINARIES_REQUIREMENTS):
-#     for dependency, features in binaries.items():
-
-        
 
