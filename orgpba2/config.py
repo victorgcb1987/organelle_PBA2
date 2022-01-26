@@ -3,9 +3,9 @@
 from importlib.util import MAGIC_NUMBER
 
 
-EXECUTABLES_REQUIREMENTS = {"minimap2": {"binaries": ["minimap2"],
+EXECUTABLES_REQUIREMENTS = {"minimap2": {"executables": ["minimap2"],
                                      "user_path": "MINIMAP2_PATH"},
-                         "blast": {"binaries": ["blastn", "makeblastdb"],
+                         "blast": {"executables": ["blastn", "makeblastdb"],
                                    "user_path": "BLAST_PATH"},
                                    }
 
@@ -28,3 +28,6 @@ MINIMAP2_LONGARGS = {"indexer": ["idx-no-seq", "alt",
 
 MAGIC_NUMS_COMPRESSED = [b'\x1f\x8b\x08', b'\x42\x5a\x68', 
                          b'\x50\x4b\x03\x04']
+
+OUTPUT_FOLDERS = {"minimap2": "01_mapping_minimap2", 
+                  "canu": "02_canu"}

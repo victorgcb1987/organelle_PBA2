@@ -21,29 +21,28 @@ class TestDependencies(unittest.TestCase):
         env["DUMMY_PATH"] = str(executable_path)
 
         # Both dummy executable and user env are defined
-        dummy_correct = {"dummy": 
-                         {"executables": ["dummy"],
-                          "user_path": "DUMMY_PATH"}}
-        assert check_executable_in_user_envs(dummy_correct), "NO"
+        dummy_correct = {"executables": ["dummy"],
+                         "user_path": "DUMMY_PATH"}
+        assert check_executable_in_user_envs(dummy_correct, program="test")
 
         # user env path is defined but dummy executable doesn't exist in
         # in that path
-        dummy_not_executable = {"dummy": 
-                            {"executables": ["not_found"],
-                             "user_path": "DUMMY_PATH"}}
-        self.assertFalse(check_executable_in_user_envs(dummy_not_executable))
+        dummy_not_executable = {"executables": ["not_found"],
+                                "user_path": "DUMMY_PATH"}
+        self.assertFalse(check_executable_in_user_envs(dummy_not_executable, 
+                                                       program="test"))
 
         # executable is defined but user env path is not
-        dummy_not_user_path = {"dummy": 
-                               {"executables": ["dummy"],
-                                "user_path": "NOT_FOUND"}}
-        self.assertFalse(check_executable_in_user_envs(dummy_not_user_path))
+        dummy_not_user_path = {"executables": ["dummy"],
+                               "user_path": "NOT_FOUND"}
+        self.assertFalse(check_executable_in_user_envs(dummy_not_user_path, 
+                                                       program="test"))
 
         # check when multiple executables are needed for running a program
-        dummy_multiple_executables= {"dummy": 
-                                  {"executables": ["dummy", "dummy2"],
-                                   "user_path": "DUMMY_PATH"}}
-        assert check_executable_in_user_envs(dummy_multiple_executables)
+        dummy_multiple_executables = {"executables": ["dummy", "dummy2"],
+                                      "user_path": "DUMMY_PATH"}
+        assert check_executable_in_user_envs(dummy_multiple_executables,
+                                             program="test")
 
     #Check if executable is in $PATH
     def test_is_executable_is_in_PATH(self):

@@ -3,16 +3,15 @@ from pathlib import Path
 from shutil import which
 
 
-def check_executable_in_user_envs(user_env):
+def check_executable_in_user_envs(user_env, program="default"):
     #This function checks if user has defined a path
     #for program needed to run orgpba2
-    program = list(user_env.keys())[0]
-    executables = user_env[program]["executables"]
-    user_path = user_env[program]["user_path"]
+    executables = user_env["executables"]
+    user_path = user_env["user_path"]
 
     #Try to find if variable is user_path is defined
     try:
-        user_path_check = env[user_path]
+        user_path_check = Path(env[user_path])
     except KeyError:
         msg = "user env {} is not defined for {}"
         print(msg.format(user_path, program))
@@ -21,16 +20,15 @@ def check_executable_in_user_envs(user_env):
     #needed to run the program
     else:
         for executable in executables:
-            executable = Path(executable)
-            full_path = user_path_check / executable
-            check = full_path.exists()
+            full_path = Path(user_path_check) / executable
+            check = full_path.absolute().exists()
             if not check:
                msg = "{} doesn't contain {} executable"
                print(msg.format(user_path_check, executable))
                return False
             else:
                 print("{} found at {}".format(executable, full_path))
-    return True
+                return user_path_check
 
 def check_is_executable_is_in_PATH(executables):
     msg = "{} is not defined in $PATH."
