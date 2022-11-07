@@ -1,0 +1,13 @@
+/Users/victorburgos/trabajo/organelle_pba/organelle_PBA2/orgpba2/tests/data/artha_chloro_ref.fasta /Users/victorburgos/trabajo/organelle_pba/organelle_PBA2/orgpba2/tests/data/test_out/04_curated_assembly_mummer/not_overlapping_seqs.fasta
+NUCMER
+
+    [S1]     [E1]  |     [S2]     [E2]  |  [LEN 1]  [LEN 2]  |  [% IDY]  | [TAGS]
+=====================================================================================
+       1    84170  |    84207        1  |    84170    84207  |    99.85  | NC_000932.1	contig_1_21459-105665
+   84171   110433  |        1    26256  |    26263    26256  |    99.97  | NC_000932.1	contig_2_1-26256
+   92909    94369  |     8226     6681  |     1461     1546  |    86.61  | NC_000932.1	contig_3_44374-53060
+   97432    98371  |     3257     2244  |      940     1014  |    90.49  | NC_000932.1	contig_3_44374-53060
+  110435   128214  |        1    17779  |    17780    17779  |    99.87  | NC_000932.1	contig_3_15695-33473
+  128216   154478  |    26256        1  |    26263    26256  |    99.97  | NC_000932.1	contig_2_1-26256
+  140278   141217  |     2244     3257  |      940     1014  |    90.49  | NC_000932.1	contig_3_44374-53060
+  144280   145740  |     6681     8226  |     1461     1546  |    86.62  | NC_000932.1	contig_3_44374-53060

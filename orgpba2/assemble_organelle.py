@@ -68,7 +68,7 @@ def parse_arguments():
     help_canu_options = "(Optional) User canu options. None by default"
     parser.add_argument("--canu_options", 
                         type=str, default="",
-                        help=help_force_assembly)
+                        help=help_canu_options)
     help_subsample = "(Optional) Subsample number of mapped reads to desired coverage using filtlong with quality priority set to 10. By default is 0 (subsampling skipped)"
     parser.add_argument("--subsample_coverage", "-sc",
                         type=int,
@@ -87,8 +87,8 @@ def parse_arguments():
                         type=int, default=0, help=help_polishing)
     help_racon = "(Optional) Racon polishing additional options. By default is none"
     parser.add_argument("--racon", type=str, default="", help=help_racon)
-    help_heteroplasmy = "(Optional) Calculate heteroplasmy if assembly is complete. By default is True"
-    parser.add_argument("--heteroplasmy", action='store_false', help=help_heteroplasmy)
+    help_heteroplasmy = "(Optional) Calculate heteroplasmy if assembly is complete. By default is False"
+    parser.add_argument("--heteroplasmy", action='store_true', help=help_heteroplasmy)
 
     return parser
 
@@ -110,7 +110,7 @@ def get_options():
     force_subsampling = options.force_subsampling
     num_polishing_iterations = options.polishing_iterations
     calculate_heteroplasmy = options.heteroplasmy
-    if options.canu:
+    if options.canu_options:
         canu_options = parse_executable_options(options.canu)
     else:
         canu_options = ""

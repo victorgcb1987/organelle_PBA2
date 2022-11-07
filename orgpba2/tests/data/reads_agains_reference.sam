@@ -1,0 +1,2 @@
+@SQ	SN:NC_000932.1	LN:154478
+@PG	ID:minimap2	PN:minimap2	VN:2.24-r1122	CL:minimap2 -ax map-pb -t 6 -o reads_agains_reference.sam /Users/victorburgos/trabajo/organelle_pba/organelle_PBA2/orgpba2/tests/data/artha_chloro_ref.fasta ../../SRR1284707_Pacific_Biosciences_Model_Organism_Genome_Sequencing-Arabidopsis_thaliana_P5C3_subreads.fastq.gz
