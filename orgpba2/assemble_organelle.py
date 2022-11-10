@@ -270,6 +270,12 @@ def main():
         sequence_chunks = chunkstring(reconstructed_sequence, 70)
         no_redundancy_fhand.write("\n".join(sequence_chunks))
         no_redundancy_fhand.close()
+        reference_seq_length = get_seq_length(reference_fpath)
+        assembly_length = get_seq_length(no_redundancy_fpath)
+        msg = "Length of the reference genome used for this assembly: {}\nLength of the assembly created: {}\n".format(str(reference_seq_length), str(assembly_length))
+        print(msg)
+        log_fhand.write(msg)
+        log_fhand.flush()
 
     # Calculate heteroplasmy
     if options["calculate_heteroplasmy"]:

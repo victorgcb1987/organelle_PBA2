@@ -9,7 +9,7 @@ from src.utils import folder_exists
 
 def run_canu(options, overwrite=False):
     #Init required variables
-    additional_arguments = options["canu_options"]
+    additional_arguments = options["canu_additional_options"]
     orgpba2_run_dir = options["out_dir"]
     run_canu_dir = orgpba2_run_dir / out_dir["canu"]
     #Check whether canu executable is in user env
