@@ -1,8 +1,0 @@
-LICENSE
-README.md
-setup.py
-OPBA2.egg-info/PKG-INFO
-OPBA2.egg-info/SOURCES.txt
-OPBA2.egg-info/dependency_links.txt
-OPBA2.egg-info/top_level.txt
-orgpba2/__init__.py
