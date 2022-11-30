@@ -1,5 +1,7 @@
 
 import argparse
+import sys
+import json
 
 from pathlib import Path
 from uuid import uuid1
@@ -24,7 +26,8 @@ from src.seqs import (check_if_assembly_is_complete, get_seqs_id_from_paf_file,
                       get_seq_length, find_circularity,
                       find_origin, remove_circularity_redundancy,
                       reconstruct_assembly_from_origin,
-                      run_blast)
+                      run_blast, get_reads_total_nucleotides, count_seqs,
+                      write_circular_region)
 from src.utils import (parse_executable_options, 
                        compress_file, check_results, chunkstring)
 
@@ -82,13 +85,21 @@ def parse_arguments():
                         type=str,
                         default="",
                         help=help_filtlong)
+
     help_polishing = "(Optional) Number of polishing iterations after assembly and before redundancy is removed. 0 by default"
     parser.add_argument("--polishing_iterations",
                         type=int, default=0, help=help_polishing)
     help_racon = "(Optional) Racon polishing additional options. By default is none"
     parser.add_argument("--racon", type=str, default="", help=help_racon)
+
     help_heteroplasmy = "(Optional) Calculate heteroplasmy if assembly is complete. By default is False"
     parser.add_argument("--heteroplasmy", action='store_true', help=help_heteroplasmy)
+
+    help_metadata = "(optional) get metadata from json file in order to fill fields for results file, if not specified all metadata fields will be set to unidentified"
+    parser.add_argument("--metadata", type=Path, default="", help=help_metadata)
+
+
+
 
     return parser
 
@@ -111,13 +122,26 @@ def get_options():
     num_polishing_iterations = options.polishing_iterations
     calculate_heteroplasmy = options.heteroplasmy
     if options.canu_options:
-        canu_options = parse_executable_options(options.canu)
+        canu_options = parse_executable_options(options.canu_options)
     else:
         canu_options = ""
     if options.racon:
         racon_options = parse_executable_options(options.racon)
     else:
         racon_options = ""
+    
+    
+    if options.metadata.is_file():
+        metadata_fhand = open(options.metadata)
+        metadata = metadata_fhand.read()
+        metadata = json.loads(metadata)
+        species = metadata.get("species", "NotFound")
+        accession = metadata.get("accession", "NotFound")
+        sra = metadata.get("SRA", "NotFound")
+    else:
+        species = "unidentified"
+        accession = "unidentified"
+        sra = "unidentified"
 
     return {'reference_input': reference_fpath,
             'sequences': sequences_fpath, 
@@ -134,12 +158,19 @@ def get_options():
             'polishing_iterations': num_polishing_iterations,
             'canu_additional_options': canu_options,
             'racon_additional_options': racon_options,
-            'calculate_heteroplasmy': calculate_heteroplasmy}
+            'calculate_heteroplasmy': calculate_heteroplasmy,
+            'species': species,
+            'accession': accession,
+            'sra': sra}
 
 def main():
     options = get_options()
     output_dir = options["out_dir"]
     reference_fpath = options["reference_input"]
+
+    stats = []
+    
+    
 
     #First check if executable requirements are met
     msg = "Check if program dependencies are met:"
@@ -159,7 +190,25 @@ def main():
     #Create log file
     log_number = uuid1()
     log_fhand = open(output_dir / "orgpba2.{}.log".format(log_number), "w")
-    
+
+    command = " ".join(sys.argv)
+    msg = "command used: {}\n".format(command)
+    print(msg)
+    log_fhand.write(msg)
+    log_fhand.flush()
+    stats.append(msg)
+
+    reads_dataset_number_of_reads = count_seqs(options["sequences"])
+    msg = "Total number of reads in dataset: {}\n".format(reads_dataset_number_of_reads)
+    stats.append(msg)
+    print(msg)
+    log_fhand.write(msg)
+    reads_dataset_number_of_nucleotides = get_reads_total_nucleotides(options["sequences"])
+    msg = "Total number of nucleotides in dataset: {} Gbs\n".format(reads_dataset_number_of_nucleotides)
+    stats.append(msg)
+    print(msg)
+    log_fhand.write(msg)
+
     #Mapping sequences to reference assembly
     msg = "Step 1: mapping reads against reference sequence with minimap2\n"
     log_fhand.write(msg)
@@ -199,6 +248,21 @@ def main():
         log_fhand.write(msg)
         log_fhand.flush()
     
+    total_number_of_mapped_reads = count_seqs(options["seqs_input"])
+    msg = "Total number of mapped reads: {}\n".format(total_number_of_mapped_reads)
+    print(msg)
+    stats.append(msg)
+    log_fhand.write(msg)
+    log_fhand.flush()
+
+    total_number_of_mapped_nucleotides = get_reads_total_nucleotides(options["seqs_input"])
+    msg = "Total number of mapped nucleotides: {} Gbs\n".format(total_number_of_mapped_nucleotides)
+    print(msg)
+    stats.append(msg)
+    log_fhand.write(msg)
+    log_fhand.flush()
+
+    
     #A subsample will be created from mapped reads if a coverage value was set
     if options["desired_coverage"] > 0:
             msg = "Step 2b: Subsampling to desired coverage of {}\n".format(str(options["desired_coverage"]))
@@ -208,7 +272,23 @@ def main():
             subsampling_results = run_subsmapling(options, overwrite=options["force_subsampling"])
             check_results(msg, subsampling_results)
             #Subsample will replace all mapped reads for donwstream steps
+            
             options["seqs_input"] = subsampling_results["output_file"]
+            total_number_of_mapped_reads = count_seqs(options["seqs_input"])
+            msg = "Total number of mapped reads, subsampled to coverage {}: {}\n".format(options["desired_coverage"], 
+                                                                                         total_number_of_mapped_reads)
+            print(msg)
+            stats.append(msg)
+            log_fhand.write(msg)
+            log_fhand.flush()
+
+            total_number_of_mapped_nucleotides = get_reads_total_nucleotides(options["seqs_input"])
+            msg = "Total number of mapped nucleotides, subsampled to coverage {}: {} Gbs\n".format(options["desired_coverage"],
+                                                                                                   total_number_of_mapped_nucleotides)
+            print(msg)
+            stats.append(msg)
+            log_fhand.write(msg)
+            log_fhand.flush()
 
     # Assembly perfomance with canu
     msg = "Step 3: asssemble contigs with canu\n"
@@ -233,6 +313,15 @@ def main():
         check_results(msg, racon_results)
         options["assembly_fpath"] = racon_results["output_file"]
 
+    total_number_of_contigs = count_seqs(options["assembly_fpath"])
+    msg = "Total number of assembled contigs: {}\n".format(total_number_of_contigs)
+    print(msg)
+    stats.append(msg)
+    log_fhand.write(msg)
+    log_fhand.flush()
+
+
+
     #Get the largest contig from assembled contigs. If it's equal or larger than reference assembly, assembly will be considered complete
     #If assembly is complete, circularity will be removed and heteroplasmy calculated
     #If not, script stops here
@@ -240,8 +329,8 @@ def main():
     if assembly_is_incomplete:
         msg = "WARNING: Assembly fragmented! Stopping now\n"
         log_fhand.write(msg)
+        stats.append("Assembly fragmented!")
         log_fhand.flush()
-        exit()
     else:
         # Find reference sequence starting point in our assembly 
         no_redundancy_fdir = output_dir / out_dir["no_redundant"]
@@ -259,11 +348,25 @@ def main():
                               options, blast_arguments=blast_arguments)
         origin = find_origin(origin_blastn["output_file"], margin=10)
         circularity = find_circularity(redundant_seq_fpath, options, overlap_length=100)
+        if circularity:
+            circularity_length = abs(circularity["overlap_start"][0]-circularity["overlap_start"][1])
+            redundant_seq_length = get_seq_length(redundant_seq_fpath)
+            msg = "Length of assembly with circularity: {}\n".format(redundant_seq_length)
+            msg += "Circularity found at {}\n".format(circularity)
+            msg += "Length of the circularity: {}\n".format(circularity_length)
+            log_fhand.write(msg)
+            stats.append(msg)
+            log_fhand.flush()
+            circular_fpath = output_dir / "05_remove_circularity_redundancy" / "04_circular_sequence.fasta"
+            write_circular_region(redundant_seq_fpath, circularity, circular_fpath)
+            msg = "Circular sequence write in {}\n".format(circular_fpath)
+            print(msg)
+            log_fhand.write(msg)
+            log_fhand.flush()
 
         # Remove redundance by circularituy
         no_redundant_seq = remove_circularity_redundancy(redundant_seq_fpath, circularity)
         reconstructed_sequence = reconstruct_assembly_from_origin(no_redundant_seq, origin)
-        print(len(reconstructed_sequence))
         #Write sequence
         no_redundancy_fhand = open(no_redundancy_fpath, "w")
         no_redundancy_fhand.write(">no_redundant_assembly\n")
@@ -274,8 +377,14 @@ def main():
         assembly_length = get_seq_length(no_redundancy_fpath)
         msg = "Length of the reference genome used for this assembly: {}\nLength of the assembly created: {}\n".format(str(reference_seq_length), str(assembly_length))
         print(msg)
+        stats.append(msg)
         log_fhand.write(msg)
         log_fhand.flush()
+    results = output_dir / "orgpba2.{}.stats".format(log_number)
+    with open(results, "w") as stats_fhand:
+        for stat in stats:
+            stats_fhand.write(stat)
+            stats_fhand.flush()
 
     # Calculate heteroplasmy
     if options["calculate_heteroplasmy"]:

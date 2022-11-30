@@ -54,6 +54,18 @@ def get_seqs_id_from_paf_file(paf_file, min_identity=0.7):
     return list_of_seqs
 
 
+def get_reads_total_nucleotides(path):
+    if file_is_compressed(path):
+        grep_command = "zcat"
+    else:
+        grep_command = "cat"
+    cmd = [grep_command, str(path), "|egrep -e '([ATGCN])\w+'|tr -d '\n'|wc -c"]
+    nucleotide_count_run = run(" ".join(cmd), shell=True, capture_output=True)
+    gigabase = 1000000000
+
+    return float((nucleotide_count_run.stdout.decode())) / gigabase
+    
+
 def store_reads_by_read_name(reads):
     #Sometimes reads have more than one match
     #This function groups matches from the same read
@@ -509,6 +521,26 @@ def filter_overlapping_contigs(assembly, options, filtered_fpath, overlap_fracti
             SeqIO.write(record, out_fhand, "fasta")
     out_fhand.flush()
     out_fhand.close()
+
+
+def write_circular_region(redundant_seq_fpath, circularity, output_fpath):
+    circular_region_start_0 = circularity["overlap_start"][0]
+    circular_region_start_1 = circularity["overlap_start"][1]
+    circular_region_end_0 = circularity["overlap_end"][0]
+    circular_region_end_1 = circularity["overlap_end"][1]
+    print(circular_region_start_0, circular_region_start_1)
+    header = ">circular_sequence, found at {}-{} and {}-{}\n".format(circular_region_start_0, circular_region_start_1,
+                                                                    circular_region_end_0, circular_region_end_1)
+    record = SeqIO.read(redundant_seq_fpath, "fasta")
+    circular_sequence = record.seq[circular_region_start_0: circular_region_start_1]
+    with open(output_fpath, "w") as out_fhand:
+        out_fhand.write(header)
+        out_fhand.write(str(circular_sequence))
+        out_fhand.flush()
+    
+
+    
+
 
 
 
