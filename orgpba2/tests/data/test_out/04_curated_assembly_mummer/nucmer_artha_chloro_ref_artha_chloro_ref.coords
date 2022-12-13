@@ -1,8 +1,0 @@
-/Users/victorburgos/trabajo/organelle_pba/organelle_PBA2/orgpba2/tests/data/artha_chloro_ref.fasta /Users/victorburgos/trabajo/organelle_pba/organelle_PBA2/orgpba2/tests/data/artha_chloro_ref.fasta
-NUCMER
-
-    [S1]     [E1]  |     [S2]     [E2]  |  [LEN 1]  [LEN 2]  |  [% IDY]  | [TAGS]
-=====================================================================================
-       1   154478  |        1   154478  |   154478   154478  |   100.00  | NC_000932.1	NC_000932.1
-   84171   110434  |   154478   128215  |    26264    26264  |   100.00  | NC_000932.1	NC_000932.1
-  128215   154478  |   110434    84171  |    26264    26264  |   100.00  | NC_000932.1	NC_000932.1
