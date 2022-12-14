@@ -283,21 +283,25 @@ def find_circularity(assembly, options, margin_length=10, overlap_length=100):
                 continue
             else:
                 if query_start <= margin_length and query_end >= (overlap_length + query_start):
-                    found_overlap_start = True
-                    begin_overlap_start = query_start
-                    begin_overlap_end = query_end
+                    if not found_overlap_start:
+                        found_overlap_start = True
+                        begin_overlap_start = query_start
+                        begin_overlap_end = query_end
                 elif query_start <= (query_length - overlap_length) and query_end >= (query_length - margin_length):
-                    found_overlap_end = True
-                    end_overlap_start = query_start
-                    end_overlap_end = query_end
+                    if not found_overlap_end:
+                        found_overlap_end = True
+                        end_overlap_start = query_start
+                        end_overlap_end = query_end
                 if reference_start <= margin_length and reference_end >= (reference_start + overlap_length):
-                    found_overlap_start = True
-                    begin_overlap_start = reference_start
-                    begin_overlap_end = reference_end
+                    if found_overlap_start:
+                        found_overlap_start = True
+                        begin_overlap_start = reference_start
+                        begin_overlap_end = reference_end
                 elif reference_start <= (query_length - overlap_length) and reference_end >= (query_length - margin_length):
-                    found_overlap_end = True
-                    end_overlap_start = reference_start
-                    end_overlap_end = reference_end
+                    if found_overlap_end:
+                        found_overlap_end = True
+                        end_overlap_start = reference_start
+                        end_overlap_end = reference_end
             if found_overlap_start and found_overlap_end:
                 overlaps = {"overlap_start": (begin_overlap_start -1, begin_overlap_end -1),
                             "overlap_end": (end_overlap_start -1 , end_overlap_end -1 ),
@@ -373,6 +377,7 @@ def calculate_repeats_regions(nucmer_output):
                 matches[query_length] = [(ref_start, ref_end), (query_start, query_end)]
     return None
 
+
 def find_biggest_inverted_repeat_sequence(inverted_repeat_regions, nucmer_output):
     #Selects the largest IR region found in assembly
     with open(nucmer_output) as coordinates_fhand:
@@ -418,40 +423,6 @@ def find_biggest_inverted_repeat_sequence(inverted_repeat_regions, nucmer_output
                                       "ref_position": [ref_start, ref_end]}
                         break
     return best_match
-
-
-# def filter_sequences_by_haplotype(mapping_results_fhand, breakpoints, margin=1000, colinear_IRs=False):
-#     #This function gets all mapped reads and looks for reads mapped in different orientation
-#     #Than reference's orientation
-#     #If reads map at the end of a breapoint with different orientation it marks it as invalid read
-#     #Then it returns all the reads without different orientations at breakpoints
-#     mapped_reads = []
-#     different_orientation_reads = []
-#     #Sometimes Inverted repeats have the same orientation
-#     if not colinear_IRs:
-#         valid_orientation = "LSC_regular-IR_regular-SSC_regular-IR_revcomp"
-#     else:
-#         valid_orientation = "LSC_regular-IR_regular-SSC_regular-IR_regular"
-#     valid_orientations = {block.split("_")[0]: block.split("_")[1] for block in valid_orientation.split("-")}   
-#     for line in mapping_results_fhand:
-#         line = line.split()
-#         sequence_name = line[0]
-#         if sequence_name not in mapped_reads:
-#             mapped_reads.append(sequence_name)
-#             orientation = line[5]
-#             reference_start = int(line[7])
-#             reference_end = int(line[8])
-#             alignment_orientations = {block.split("_")[0]: block.split("_")[1] for block in orientation.split("-")}
-#             for block, orientation_valid in valid_orientations.items():
-#                 if orientation_valid != alignment_orientations[block]:
-#                     for breakpoint, position in breakpoints.items():
-#                         if breakpoint.startswith(block):
-#                             if reference_start < position and reference_end > position:
-#                                 if (position - reference_start) >= margin and (reference_end - position) >= margin:
-#                                     print(sequence_name, orientation, reference_start, reference_end)
-#                                     #if sequence_name not in different_orientation_reads:
-#                                     different_orientation_reads.append(sequence_name)
-#     return [read for read in mapped_reads if  different_orientation_reads.count(read) > 1]
 
 
 def check_if_assembly_is_complete(assembly_fpath, genome_size, margin=10):
