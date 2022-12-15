@@ -74,7 +74,7 @@ def get_reads_total_nucleotides(path):
     seqtk_run  = run(" ".join(seqtk_run), shell=True,
                          capture_output=True)
     nucleotide_count = 0
-    for read in seqtk_run.stodut.decode():
+    for read in seqtk_run.stdout.decode():
         nucleotide_count += int(read.split()[1])
     gigabase = 1000000000
     return float((nucleotide_count)) / gigabase
