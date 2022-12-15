@@ -54,16 +54,30 @@ def get_seqs_id_from_paf_file(paf_file, min_identity=0.7):
     return list_of_seqs
 
 
-def get_reads_total_nucleotides(path):
-    if file_is_compressed(path):
-        grep_command = "zcat"
-    else:
-        grep_command = "cat"
-    cmd = [grep_command, str(path), "|egrep -e '([ATGCN])\w+'|tr -d '\n'|wc -c"]
-    nucleotide_count_run = run(" ".join(cmd), shell=True, capture_output=True)
-    gigabase = 1000000000
+#remove because it was very time expensive
 
-    return float((nucleotide_count_run.stdout.decode())) / gigabase
+# def get_reads_total_nucleotides(path):
+#     if file_is_compressed(path):
+#         grep_command = "zcat"
+#     else:
+#         grep_command = "cat"
+#     cmd = [grep_command, str(path), "|egrep -e '([ATGCN])\w+'|tr -d '\n'|wc -c"]
+#     nucleotide_count_run = run(" ".join(cmd), shell=True, capture_output=True)
+#     gigabase = 1000000000
+
+#     return float((nucleotide_count_run.stdout.decode())) / gigabase
+
+
+def get_reads_total_nucleotides(path):
+    seqtk_exectuable = get_executables(exec_reqs["seqtk"])
+    seqtk_run = [seqtk_exectuable, "comp", str(path)]
+    seqtk_run  = run(" ".join(seqtk_run), shell=True,
+                         capture_output=True)
+    nucleotide_count = 0
+    for read in seqtk_run.stodut.decode():
+        nucleotide_count += int(read.split()[1])
+    gigabase = 1000000000
+    return float((nucleotide_count)) / gigabase
     
 
 def store_reads_by_read_name(reads):
@@ -499,7 +513,6 @@ def write_circular_region(redundant_seq_fpath, circularity, output_fpath):
     circular_region_start_1 = circularity["overlap_start"][1]
     circular_region_end_0 = circularity["overlap_end"][0]
     circular_region_end_1 = circularity["overlap_end"][1]
-    print(circular_region_start_0, circular_region_start_1)
     header = ">circular_sequence, found at {}-{} and {}-{}\n".format(circular_region_start_0, circular_region_start_1,
                                                                     circular_region_end_0, circular_region_end_1)
     record = SeqIO.read(redundant_seq_fpath, "fasta")
@@ -508,12 +521,3 @@ def write_circular_region(redundant_seq_fpath, circularity, output_fpath):
         out_fhand.write(header)
         out_fhand.write(str(circular_sequence))
         out_fhand.flush()
-    
-
-    
-
-
-
-
-    
-        

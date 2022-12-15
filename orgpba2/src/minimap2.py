@@ -76,7 +76,6 @@ def run_minimap2(options, overwrite=False, haplotypes=False):
     if is_sam_output:
         cmd += ["|samtools view -F 2052"]
     cmd += ["> {}".format(str(out_filepath))]
-    print(cmd)
 
     #running minimap2
     minimap2_run = run(" ".join(cmd), shell=True, 
@@ -103,7 +102,6 @@ def run_minimap2_for_polishing(options):
     cmd.append(str(options["seqs_input"]))
     cmd.append("-t {}".format(str(options["number_threads"])))
     cmd.append("> {}".format(str(options["mapped_reads_against_assembly_to_polish_fpath"])))
-    print(" ".join(cmd))
     minimap2_run = run(" ".join(cmd), shell=True, 
                        capture_output=True)
     results = {"output_file": options["mapped_reads_against_assembly_to_polish_fpath"],
@@ -133,7 +131,6 @@ def run_minimap2_for_heteroplasmy(options):
     cmd.append(str(options["seqs_input"]))
     cmd.append("-t {}".format(str(options["number_threads"])))
     cmd.append("> {}".format(str(output_fpath)))
-    print(" ".join(cmd))
     minimap2_run = run(" ".join(cmd), shell=True, 
                        capture_output=True)
     results = {"output_file": output_fpath,

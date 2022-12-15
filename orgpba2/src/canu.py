@@ -54,7 +54,6 @@ def run_canu(options, overwrite=False):
     
 
     #running canu
-    print(" ".join(cmd))
     canu_run = run(" ".join(cmd), shell=True, 
                        capture_output=True)
 

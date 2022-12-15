@@ -33,7 +33,6 @@ def run_racon(options, overwrite=False):
                 for additional_option in options["racon_additional_options"]:
                     cmd.append(additional_option)
             cmd.append("> {}".format(polished_assembly_fpath))
-            print(" ".join(cmd))
             racon_run = run(" ".join(cmd), shell=True, 
                             capture_output=True)
             assembly_to_polish_fpath = polished_assembly_fpath

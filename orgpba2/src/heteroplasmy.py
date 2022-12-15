@@ -56,15 +56,12 @@ def create_haplotype_breakpoints_sequences(sequence, breakpoints, colinear=False
                                            "position": next_position -1})
 
         #Get different orientations of parts
-        print(higher_breakpoints)
         first_part_name, _ = value.split("_")
-        print(value, initial_position, position)
         first_part_regular = sequence[initial_position:position]
         first_part_reversed = sequence[initial_position:position][::-1]
         first_part_complement = complement(sequence[initial_position:position])
         first_part_revcomp = reverse_complement(sequence[initial_position:position])   
         initial_position = position
-        print(first_part_name)
         parts[first_part_name] = {"forward": first_part_regular, 
                                   "reverse": first_part_reversed, 
                                   "complement": first_part_complement,

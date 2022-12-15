@@ -37,7 +37,6 @@ def run_subsmapling(options, overwrite=False):
             cmd.append(filtlong_options)
 
         cmd.append("| gzip > {}".format(str(out_fpath)))
-        print(cmd)
 
         filtlong_run = run(" ".join(cmd), shell=True, 
                         capture_output=True)
