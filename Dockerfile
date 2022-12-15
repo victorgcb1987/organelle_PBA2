@@ -5,7 +5,7 @@ RUN apt install curl --assume-yes
 RUN apt install bzip2 --assume-yes
 RUN apt install cmake --assume-yes
 RUN apt install default-jdk --assume-yes
-RUN apt install install default-jre
+RUN apt install default-jre --assume-yes
 COPY . /organelle_pba2
 WORKDIR /organelle_pba2
 RUN chmod +x /organelle_pba2/orgpba2/assemble_organelle.py
