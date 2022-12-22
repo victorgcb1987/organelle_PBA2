@@ -14,6 +14,7 @@ from src.utils import file_exists, folder_exists
 from src.canu import run_canu
 from src.config  import EXECUTABLES_REQUIREMENTS, OUTPUT_FILENAMES
 from src.config import OUTPUT_FOLDERS as out_dir
+from src.curation import run_nucmer, get_genomic_coordinates_from_assembly, create_curated_genome
 from src.heteroplasmy import (find_blocks_breakpoints, create_haplotype_breakpoints_sequences, 
                               write_haplotypes_breakpoints, calculate_heteroplasmy_ratios, 
                               write_heteroplasmy_results)
@@ -96,9 +97,8 @@ def parse_arguments():
     help_heteroplasmy = "(Optional) Calculate heteroplasmy if assembly is complete. By default is False"
     parser.add_argument("--heteroplasmy", action='store_true', help=help_heteroplasmy)
 
-    help_metadata = "(optional) get metadata from json file in order to fill fields for results file, if not specified all metadata fields will be set to unidentified"
-    parser.add_argument("--metadata", type=Path, default="", help=help_metadata)
-
+    help_curation = "(Optional) do a  post-assembly curation, based in it's alignment against the reference genome. Not reccommended if species genomes are too different"
+    parser.add_argument("--curate_assembly", action='store_true', help=help_curation)
 
 
 
@@ -122,6 +122,7 @@ def get_options():
     force_subsampling = options.force_subsampling
     num_polishing_iterations = options.polishing_iterations
     calculate_heteroplasmy = options.heteroplasmy
+    curate_assembly = options.curate_assembly
     if options.canu_options:
         canu_options = parse_executable_options(options.canu_options)
     else:
@@ -131,19 +132,6 @@ def get_options():
     else:
         racon_options = ""
     
-    
-    if options.metadata.is_file():
-        metadata_fhand = open(options.metadata)
-        metadata = metadata_fhand.read()
-        metadata = json.loads(metadata)
-        species = metadata.get("species", "NotFound")
-        accession = metadata.get("accession", "NotFound")
-        sra = metadata.get("SRA", "NotFound")
-    else:
-        species = "unidentified"
-        accession = "unidentified"
-        sra = "unidentified"
-
     return {'reference_input': reference_fpath,
             'sequences': sequences_fpath, 
             'out_dir': output_dir,
@@ -160,19 +148,14 @@ def get_options():
             'canu_additional_options': canu_options,
             'racon_additional_options': racon_options,
             'calculate_heteroplasmy': calculate_heteroplasmy,
-            'species': species,
-            'accession': accession,
-            'sra': sra}
+            'curate_assembly': curate_assembly}
 
 def main():
     options = get_options()
     output_dir = options["out_dir"]
     reference_fpath = options["reference_input"]
-
     stats = []
     
-    
-
     #First check if executable requirements are met
     msg = "Check if program dependencies are met:"
     for program, user_env in EXECUTABLES_REQUIREMENTS.items():
@@ -191,6 +174,7 @@ def main():
     #Create log file
     log_number = uuid1()
     log_fhand = open(output_dir / "orgpba2.{}.log".format(log_number), "w")
+    results = output_dir / "orgpba2.{}.stats".format(log_number)
 
     command = " ".join(sys.argv)
     msg = "command used: {}\n".format(command)
@@ -326,12 +310,18 @@ def main():
     #Get the largest contig from assembled contigs. If it's equal or larger than reference assembly, assembly will be considered complete
     #If assembly is complete, circularity will be removed and heteroplasmy calculated
     #If not, script stops here
+    print(options["assembly_fpath"])
     assembly_is_incomplete, largest_contig = check_if_assembly_is_complete(options["assembly_fpath"], options["genome_size"], margin=10)
     if assembly_is_incomplete:
         msg = "WARNING: Assembly fragmented! Stopping now\n"
         log_fhand.write(msg)
         stats.append("Assembly fragmented!")
         log_fhand.flush()
+        with open(results, "w") as stats_fhand:
+            for stat in stats:
+                stats_fhand.write(stat)
+                stats_fhand.flush()
+        exit()
     else:
         # Find reference sequence starting point in our assembly 
         no_redundancy_fdir = output_dir / out_dir["no_redundant"]
@@ -381,11 +371,28 @@ def main():
         stats.append(msg)
         log_fhand.write(msg)
         log_fhand.flush()
-    results = output_dir / "orgpba2.{}.stats".format(log_number)
+    
+    if options["curate_assembly"]:
+        msg = "Curating genome assenbly with nucmer"
+        print(msg)
+        log_fhand.write(msg)
+        log_fhand.flush()
+        options["assembly_fpath"] = no_redundancy_fpath
+        nucmer_results = run_nucmer(options, reference_fpath)
+        check_results(msg, nucmer_results)
+        nucmer_output = nucmer_results["output_file"]
+        genomic_coordinates = get_genomic_coordinates_from_assembly(nucmer_output)
+        curated_assembly_results = create_curated_genome(options, genomic_coordinates)
+        curated_assembly = curated_assembly_results["output_dir"] / "curated_assembly.fasta"
+        curated_assembly_length = get_seq_length(curated_assembly)
+        stat = "Length of curated assembly: {}\n".format(curated_assembly_length)
+        stats.append(stat)
+
     with open(results, "w") as stats_fhand:
         for stat in stats:
             stats_fhand.write(stat)
             stats_fhand.flush()
+
 
     # Calculate heteroplasmy
     if options["calculate_heteroplasmy"]:

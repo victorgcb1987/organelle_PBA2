@@ -36,10 +36,16 @@ def run_racon(options, overwrite=False):
             racon_run = run(" ".join(cmd), shell=True, 
                             capture_output=True)
             assembly_to_polish_fpath = polished_assembly_fpath
+            return_code = racon_run.returncode
+            msg = racon_run.stderr.decode()
+        else:
+            assembly_to_polish_fpath = polished_assembly_fpath
+            return_code = 0
+            msg = "polishing step already done"
         iterations += 1
     results = {"output_file": assembly_to_polish_fpath,
-               "return_code": racon_run.returncode,
-               "log_messages":racon_run.stderr.decode()}
+               "return_code": return_code,
+               "log_messages": msg}
     return results
     
 
