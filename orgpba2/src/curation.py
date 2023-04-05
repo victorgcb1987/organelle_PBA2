@@ -117,7 +117,7 @@ def create_curated_genome(options, coordinates_blocks):
             subseq = str(assembly_records[block["contig_id"]].seq[block["assembly_start"] -1 : block["assembly_end"]].reverse_complement())
             output_contigs_fhand.write(">curated_contig{}\t{}\n{}\n".format(contig_count, len(subseq), str(subseq)))
             seq += subseq
-            total_length = len(seq)
+    total_length = len(seq)
     seq = chunkstring(seq, 60)
     output_fhand.write(">curated_assembly\t{}\n".format(total_length))
     for line in seq:

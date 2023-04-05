@@ -138,3 +138,44 @@ def run_minimap2_for_heteroplasmy(options):
                "log_messages": minimap2_run.stderr.decode()}
     return results
 
+
+def run_minimap2_for_insertions(options, assembly=""):
+    #Minimap run for heteroplasmy ratio calculations
+    minimap2_executable = get_executables(exec_reqs["minimap2"])
+    cmd = [minimap2_executable]
+    alns_fdir = output_fpath = options["out_dir"] / out_dir["minimap2"]
+    if not alns_fdir.exists():
+        alns_fdir.mkdir(parents=True)
+
+    output_fpath = options["alignment_fpath"]
+    if file_exists(output_fpath):
+        results = results = {"output_file": output_fpath,
+                             "return_code": 0,
+                             "log_messages": "File already exists"}
+        print(results)
+        return results
+    if options["sequence_technology"] == "pacbio":
+        cmd.append("-cx map-pb")
+    if options["sequence_technology"] == "nanopore":
+        cmd.append("-cx map-ont")
+    if options["sequence_technology"] == "pacbio-hifi":
+        cmd.append("-cx map-hifi")
+    cmd.append("--secondary=no --cs")
+    if assembly == "organelle":
+        cmd.append(str(options['organelle_assembly']))
+    elif assembly == "nuclear":
+        cmd.append(str(options['nuclear_assembly']))
+    elif assembly == "exclude":
+        cmd.append(str(options['exclude_assembly']))
+    cmd.append(str(options["sequences"]))
+    cmd.append("-t {}".format(str(options["number_threads"])))
+    cmd.append("> {}".format(str(output_fpath)))
+    minimap2_run = run(" ".join(cmd), shell=True, 
+                       capture_output=True)
+    results = {"output_file": output_fpath,
+               "return_code": minimap2_run.returncode,
+               "log_messages": minimap2_run.stderr.decode()}
+    print(cmd)
+    print(results)
+    return results
+

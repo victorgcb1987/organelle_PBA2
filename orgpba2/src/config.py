@@ -32,7 +32,7 @@ OUTPUT_FOLDERS = {"haplotypes": "07_haplotypes",
                   "curated_assembly": "06_curated_assembly_mummer",
                   "no_redundant": "05_remove_circularity_redundancy",
                   "repetitive": "05_rescaffold_repetitive_regions",
-                  }
+                  "seqs_to_check": "02_seqs_to_check"}
 OUTPUT_FILENAMES = {"haplotypes": "06_haplotypes.fasta",
                     "minimap2": "01_mapping_minimap2.paf",
                     "mapped_seqs": "02_mapped_seqs.fq.gz",

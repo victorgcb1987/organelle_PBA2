@@ -26,6 +26,8 @@ def run_canu(options, overwrite=False):
                 add_prefix = False
             if argument == "stopOnLowCoverage":
                 cmd.append("{}={}".format(argument, value))
+            elif argument == "minInputCoverage":
+                cmd.append("{}={}".format(argument, value))
             else:
                 cmd.append("{} {}".format(argument, value))
     if add_prefix:

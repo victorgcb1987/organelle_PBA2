@@ -2,7 +2,6 @@
 
 import argparse
 import sys
-import json
 
 from pathlib import Path
 from uuid import uuid1
@@ -99,8 +98,6 @@ def parse_arguments():
 
     help_curation = "(Optional) do a  post-assembly curation, based in it's alignment against the reference genome. Not reccommended if species genomes are too different"
     parser.add_argument("--curate_assembly", action='store_true', help=help_curation)
-
-
 
     return parser
 
