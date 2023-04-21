@@ -1,9 +1,11 @@
 from Bio import SeqIO
 
 from src.config import EXECUTABLES_REQUIREMENTS as exec_reqs
-from src.config import COMPLEMENTARY_NUCLEOTIDE as compl_nucl
 from src.config import OUTPUT_FOLDERS as out_dir
-from src.utils import sequence_kind
+from src.dependencies import get_executables
+from tempfile import NamedTemporaryFile
+from src.utils import file_exists
+from subprocess import run
 
 
 def get_reads_alignments_info(reads_fhand):
@@ -34,6 +36,8 @@ def get_reads_alignments_info(reads_fhand):
                                                     'query_end': query_end,
                                                     'strand': strand,
                                                     'subject_name': subject_name}
+            elif strand != reads_alignments_info[read_name]["strand"]:
+                reads_alignments_info.pop(read_name)
     return reads_alignments_info
 
 def calculate_reads_query_coverage(alignments_info):
@@ -55,21 +59,26 @@ def select_reads_by_coverage(reads_coverage, coverage_cutoff = 0.9, mode="under"
 def filter_reads_by_name(alignments_info, readnames):
     return {readname: alignments_info[readname] for readname in readnames}
 
-def write_aligned_reads_into_fasta(arguments,filtered_reads,not_aligned_file):
-    sequences = arguments["sequences"]
-    sequences_kind = sequence_kind(sequences)
-    if sequences_kind == "fasta":
-        sequences_records = SeqIO.index(str(sequences), "fasta")
-    elif sequences_kind == "fastq":
-        sequences_records = SeqIO.index(str(sequences), "fastq")
-    with open(not_aligned_file, "w") as out_fhand:
-        for read in filtered_reads:
-            sequence = "{} \n".format(sequences_records[read].seq)
-            header = ">{} \n".format(sequences_records[read].id)
-            out_fhand.write(header)
-            out_fhand.write(sequence)
-            out_fhand.flush()
-    return not_aligned_file
+
+def write_seqs_from_seqs_id(seq_ids, seqs_pool, seqs_out_fpath, overwrite=False):
+    #Extract reads mapped to reference genome
+    seqtk_exectuable = get_executables(exec_reqs["seqtk"])
+    seqs_ids_fhand = NamedTemporaryFile()
+    seqs_ids_fhand.write("\n".join(seq_ids).encode())
+    seqs_ids_fhand.flush()
+    if not file_exists(seqs_out_fpath) or overwrite:
+        cmd = [seqtk_exectuable, "subseq", str(seqs_pool), 
+               seqs_ids_fhand.name, "| gzip -c >", str(seqs_out_fpath)]
+        seqtk_run  = run(" ".join(cmd), shell=True,
+                         capture_output=True)
+        results = {"output_files": [seqs_out_fpath],
+                   "return_code": seqtk_run.returncode,
+                   "log_messages": seqtk_run.stderr.decode()}
+    else:
+        results = {"output_files": [seqs_out_fpath],
+                   "return_code": 0,
+                   "log_messages": "File exists"}
+    return results
 
 
 def get_insertions_positions(nuclear_alignments, organelle_alignments):
@@ -117,6 +126,15 @@ def get_insertions_positions(nuclear_alignments, organelle_alignments):
                     chroms.append(nuclear_hit["subject_name"])
         return chroms, insertion_reads
 
+
+def remove_organelle_offset(alignments_info, organelle_length):
+    for readname, value in alignments_info.items():
+        if value['subject_start'] >= organelle_length and value['subject_end'] >= organelle_length:
+            alignments_info[readname]['subject_start'] = value['subject_start'] - organelle_length
+            alignments_info[readname]['subject_end'] = value['subject_end'] - organelle_length
+    return alignments_info
+
+
 def exclude_reads_with_less_coverage(organelles_alignments_info, exclude_alignments_info):
     alignments_info = {}
     for read_name, values in organelles_alignments_info.items():
@@ -125,3 +143,43 @@ def exclude_reads_with_less_coverage(organelles_alignments_info, exclude_alignme
         elif values['total_aligned_length'] >= exclude_alignments_info[read_name]['total_aligned_length']:
             alignments_info[read_name] = values
     return alignments_info
+
+
+def group_reads_of_same_insertion(insertion_reads, organelle_boundaires=100):
+    # insertions_positions[name] = {'insertion_starts' : joined_groups_starts, 
+    #                               'insertion_ends' : joined_groups_end,
+    #                                'organelle_start' : p_start_organ, 
+    #                                'organelle_end' : p_end_organ,
+    #                                'nuclear' : chrom,
+    #                                'reads' : list_reads}
+    groups = []
+    # Recorrer el diccionario original y agrupar los valores de 'name' según si las regiones se solapan o no
+    for key, value in insertion_reads.items():
+        group_found = False
+    
+    # Buscar si existe algún grupo que se solape con esta entrada
+        for group in groups:
+            if not groups:
+                break
+            group_start = min(group['insertion_starts'])
+            group_end = max(group['insertion_ends'])
+            if abs(value['insertion_start'] - group_start) <= organelle_boundaires and abs(value['insertion_end'] - group_end) <= organelle_boundaires and value["chrom"] == group["nuclear"]:
+                group['readnames'].append(key)
+                group["insertion_starts"].append(value['insertion_start'])
+                group["insertion_ends"].append(value["insertion_end"])
+                group["organelle_starts"].append(value["organelle_start"])
+                group["organelle_ends"].append(value["organelle_end"])
+                group_found = True
+                break
+    
+    # Si no se encontró ningún grupo que se solape, crear uno nuevo
+        if not group_found:
+            groups.append({
+                'organelle_starts': [value['organelle_start']],
+                'organelle_ends': [value['organelle_end']],
+                'readnames': [key],
+                'nuclear': value["chrom"],
+                'insertion_starts': [value["insertion_start"]],
+                'insertion_ends': [value["insertion_end"]]
+            })
+    return groups

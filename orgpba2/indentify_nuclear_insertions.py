@@ -1,11 +1,14 @@
 from argparse import ArgumentParser
 from pathlib import Path
+from statistics import median
+from sys import argv
 
 from src.config import OUTPUT_FOLDERS as out_dir
 from src.minimap2 import run_minimap2_for_insertions
 from src.nuclear_insertions import (get_reads_alignments_info, calculate_reads_query_coverage, 
-                                    select_reads_by_coverage, filter_reads_by_name, write_aligned_reads_into_fasta,
-                                    get_insertions_positions, exclude_reads_with_less_coverage)
+                                    select_reads_by_coverage, filter_reads_by_name, write_seqs_from_seqs_id,
+                                    get_insertions_positions, exclude_reads_with_less_coverage, remove_organelle_offset,
+                                    group_reads_of_same_insertion)
 
 
 def parse_arguments():
@@ -53,6 +56,11 @@ def parse_arguments():
                         "-e", type=str,
                         help=help_organelle_comparison,
                         default="")
+    help_organelle_length = "(Required) organelle length"
+    parser.add_argument("--length",
+                        '-l', type=int,
+                        help=help_organelle_length,
+                        required=True)
     return parser
     
 
@@ -65,6 +73,7 @@ def get_options():
     num_threads = options.threads
     sequence_technology = options.technology
     coverage_cutoff = options.coverage_cutoff
+    organelle_length = options.length
     if options.exclude:
         exclude = Path(options.exclude)
     else:
@@ -78,7 +87,8 @@ def get_options():
             'sequence_technology': sequence_technology,
             'organelle_assembly': organelle_assembly_fpath,
             'coverage_cutoff': coverage_cutoff,
-            'exclude_assembly': exclude}
+            'exclude_assembly': exclude,
+            'organelle_length': organelle_length}
 
 
 def main():
@@ -99,6 +109,7 @@ def main():
 
     with open(organelle_alignments) as alignments_fhand:
         organelle_alignments_info = get_reads_alignments_info(alignments_fhand)
+        organelle_alignments_info = remove_organelle_offset(organelle_alignments_info, arguments['organelle_length'])
         if arguments["exclude_assembly"]:
             with open(exclude_alignments) as alignments_fhand:
                 exclude_alignments_info = get_reads_alignments_info(alignments_fhand)
@@ -110,9 +121,9 @@ def main():
         seqs_check = arguments["out_dir"] / out_dir["seqs_to_check"]
         if not seqs_check.exists():
             seqs_check.mkdir(parents=True)
-        seqs_check = seqs_check / "reads_mapped_against_organelle.fasta"
+        seqs_check = seqs_check / "reads_mapped_against_organelle.fasta.gz"
         if not seqs_check.exists():
-            write_aligned_reads_into_fasta(arguments,filtered_reads,seqs_check)
+            write_seqs_from_seqs_id(filtered_reads,arguments["sequences"],seqs_check)
         arguments["sequences"] = seqs_check
     nuclear_alignments = arguments["out_dir"] / out_dir["minimap2"] /  "mappings_against_nuclear.paf"
     if not nuclear_alignments.exists():
@@ -120,11 +131,28 @@ def main():
         nuclear_alignments = run_minimap2_for_insertions(arguments, assembly="nuclear")["output_file"]
     with open(nuclear_alignments) as alignments_fhand:
         nuclear_alignments_info = get_reads_alignments_info(alignments_fhand)
-        reads_over_coverage = select_reads_by_coverage(organelle_coverages, coverage_cutoff=0.9, mode="over")
-        for read in reads_over_coverage:
-            print(read)
-     
-    insertions_reads = get_insertions_positions(nuclear_alignments_info,organelle_alignments_info)
+        nuclear_coverages = calculate_reads_query_coverage(nuclear_alignments_info)
+        reads_over_coverage = select_reads_by_coverage(nuclear_coverages, coverage_cutoff=0.9, mode="over")
+        nuclear_alignments_info = {readname: values for readname, values in  nuclear_alignments_info.items() if readname in reads_over_coverage}
+    chroms, insertions_reads = get_insertions_positions(nuclear_alignments_info,organelle_alignments_info)
+    insertions = group_reads_of_same_insertion(insertions_reads)
+    results_fpath = arguments["out_dir"] / "insertions_found.tsv"
+    with open(results_fpath, "w") as results_fhand:
+        results_fhand.write("#{}".format(" ".join(argv)))
+        results_fhand.write("#CHROM_ID\tNUCLEAR_START\tNUCLEAR_END\tORGANELLE_START\tORGANELLE_END\tINSERTION_LENGTH\tNUM_READS\tREADS_ID\n")
+        for insertion in insertions:
+            chrom = insertion["nuclear"]
+            nuclear_start = str(median(insertion["insertion_starts"]))
+            nuclear_end = str(median(insertion["insertion_ends"]))
+            organelle_starts = str(median(insertion["organelle_starts"]))
+            organelle_ends = str(median(insertion["organelle_ends"]))
+            nupt_length = str(median(insertion["organelle_ends"]) - median(insertion["organelle_starts"]))
+            num_reads = len(insertion["readnames"])
+            readnames = ",".join(insertion["readnames"])
+            results_fhand.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(chrom, nuclear_start, nuclear_end, organelle_starts, organelle_ends, nupt_length, num_reads, readnames))
+            results_fhand.flush()
+
+
 
         
 

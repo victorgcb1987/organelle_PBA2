@@ -154,13 +154,16 @@ def run_minimap2_for_insertions(options, assembly=""):
                              "log_messages": "File already exists"}
         print(results)
         return results
-    if options["sequence_technology"] == "pacbio":
-        cmd.append("-cx map-pb")
-    if options["sequence_technology"] == "nanopore":
-        cmd.append("-cx map-ont")
-    if options["sequence_technology"] == "pacbio-hifi":
-        cmd.append("-cx map-hifi")
-    cmd.append("--secondary=no --cs")
+    # if assembly == "organelle" or assembly == "exclude":
+    #     cmd.append("-cx asm20")
+    # elif options["sequence_technology"] == "pacbio":
+    #     cmd.append("-cx map-pb")
+    # elif options["sequence_technology"] == "nanopore":
+    #     cmd.append("-cx map-ont")
+    # elif options["sequence_technology"] == "pacbio-hifi":
+    #     cmd.append("-cx map-hifi")
+    cmd.append("-c -k 10 -B 1")
+    cmd.append("--secondary=no  ")
     if assembly == "organelle":
         cmd.append(str(options['organelle_assembly']))
     elif assembly == "nuclear":
