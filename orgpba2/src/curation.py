@@ -106,7 +106,7 @@ def create_curated_genome(options, coordinates_blocks):
     seq = ""
     contig_count = 0
     for block in coordinates_blocks:
-        if abs(block["assembly_start"] - block["assembly_end"]) < 10:
+        if abs(block["assembly_start"] - block["assembly_end"]) < 100:
             continue
         contig_count += 1
         if block["strand"] == "+":

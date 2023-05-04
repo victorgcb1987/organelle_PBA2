@@ -162,7 +162,7 @@ def run_minimap2_for_insertions(options, assembly=""):
     #     cmd.append("-cx map-ont")
     # elif options["sequence_technology"] == "pacbio-hifi":
     #     cmd.append("-cx map-hifi")
-    cmd.append("-c -k 10")
+    cmd.append("-c -k 11")
     cmd.append("--secondary=no  ")
     if assembly == "organelle":
         cmd.append(str(options['organelle_assembly']))
