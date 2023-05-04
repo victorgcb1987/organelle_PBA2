@@ -50,8 +50,6 @@ def run_minimap2(options, overwrite=False, haplotypes=False):
             cmd.append("-{} {}".format(argument, value))
         elif argument == "secondary":
             cmd.append("--secondary {}".format(value))
-        elif argument == "correctedErrorRate":
-            cmd.append("correctedErrorRate={}".format(value))
         
     #If num_threads is set globally when running org_pba2
     #and -t is not set in minimap2 arguments we will set

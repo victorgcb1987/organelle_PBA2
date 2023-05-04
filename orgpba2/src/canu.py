@@ -28,8 +28,11 @@ def run_canu(options, overwrite=False):
                 cmd.append("{}={}".format(argument, value))
             elif argument == "minInputCoverage":
                 cmd.append("{}={}".format(argument, value))
+            elif argument == "correctedErrorRate":
+                cmd.append("correctedErrorRate={}".format(value))
             else:
                 cmd.append("{} {}".format(argument, value))
+                
     if add_prefix:
         cmd.append("-p 03_assembled")
     #adding output_dir
