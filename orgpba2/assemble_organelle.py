@@ -28,7 +28,7 @@ from src.seqs import (check_if_assembly_is_complete, get_seqs_id_from_paf_file,
                       find_origin, remove_circularity_redundancy,
                       reconstruct_assembly_from_origin,
                       run_blast, get_reads_total_nucleotides, count_seqs,
-                      write_circular_region)
+                      write_circular_region, concate_reference_genome)
 from src.utils import (parse_executable_options, 
                        compress_file, check_results, chunkstring)
 
@@ -167,7 +167,10 @@ def main():
     #Create output dir
     if not folder_exists(output_dir):
         output_dir.mkdir(parents=True, exist_ok=True)
-
+    concatenated_reference_fpath = concate_reference_genome(reference_fpath, output_dir)
+    
+    mapping_options = options.copy()
+    mapping_options["reference_input"] = concatenated_reference_fpath
     #Create log file
     log_number = uuid1()
     log_fhand = open(output_dir / "orgpba2.{}.log".format(log_number), "w")
@@ -195,7 +198,7 @@ def main():
     msg = "Step 1: mapping reads against reference sequence with minimap2\n"
     log_fhand.write(msg)
     log_fhand.flush()
-    minimap2_results = run_minimap2(options, overwrite=options["force_mapping"])
+    minimap2_results = run_minimap2(mapping_options, overwrite=options["force_mapping"])
     check_results(msg, minimap2_results)
     log_fhand.write(minimap2_results["log_messages"])
     log_fhand.flush()
@@ -361,9 +364,9 @@ def main():
         sequence_chunks = chunkstring(reconstructed_sequence, 70)
         no_redundancy_fhand.write("\n".join(sequence_chunks))
         no_redundancy_fhand.close()
-        reference_seq_length = get_seq_length(reference_fpath)
+        #reference_seq_length = get_seq_length(reference_fpath)
         assembly_length = get_seq_length(no_redundancy_fpath)
-        msg = "Length of the reference genome used for this assembly: {}\nLength of the assembly created: {}\n".format(str(reference_seq_length), str(assembly_length))
+        msg = "Length of the reference genome used for this assembly: {}\nLength of the assembly created: {}\n".format(str(options["genome_size"]), str(assembly_length))
         print(msg)
         stats.append(msg)
         log_fhand.write(msg)

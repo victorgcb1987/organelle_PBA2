@@ -112,7 +112,7 @@ def main():
         organelle_alignments_info = remove_organelle_offset(organelle_alignments_info, arguments['organelle_length'])
         if arguments["exclude_assembly"]:
             with open(exclude_alignments) as alignments_fhand:
-                exclude_alignments_info = get_reads_alignments_info(alignments_fhand)
+                exclude_alignments_info = get_reads_alignments_info(alignments_fhand, exclude_potential_chimeras=False)
                 organelle_alignments_info = exclude_reads_with_less_coverage(organelle_alignments_info, exclude_alignments_info)
 
         organelle_coverages = calculate_reads_query_coverage(organelle_alignments_info)

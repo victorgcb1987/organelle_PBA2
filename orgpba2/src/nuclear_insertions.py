@@ -8,7 +8,7 @@ from src.utils import file_exists
 from subprocess import run
 
 
-def get_reads_alignments_info(reads_fhand):
+def get_reads_alignments_info(reads_fhand, exclude_potential_chimeras=True):
 #Get info of diferent reads from an archive in paf format
     reads_alignments_info = {}
     for line in reads_fhand:
@@ -25,7 +25,7 @@ def get_reads_alignments_info(reads_fhand):
             query_start = int(line[2])
             query_end = int(line[3])
             strand = line[4]
-            total_alignment =  int(line[3]) - int(line[2])
+            total_alignment =  int(line[3]) - int(line[2])  
             if read_name not in reads_alignments_info:
                 reads_alignments_info[read_name] = {'length' : read_length, 
                                                     'target_positions' : target_positions,
@@ -36,9 +36,9 @@ def get_reads_alignments_info(reads_fhand):
                                                     'query_end': query_end,
                                                     'strand': strand,
                                                     'subject_name': subject_name}
-            elif strand != reads_alignments_info[read_name]["strand"]:
+            elif strand != reads_alignments_info[read_name]["strand"] and not exclude_potential_chimeras:
                 reads_alignments_info.pop(read_name)
-    return reads_alignments_info
+    return reads_alignments_info    
 
 def calculate_reads_query_coverage(alignments_info):
 #Calculate reads query coverage (aligned part respect total)
