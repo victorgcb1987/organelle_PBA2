@@ -36,7 +36,7 @@ def get_reads_alignments_info(reads_fhand, exclude_potential_chimeras=True):
                                                     'query_end': query_end,
                                                     'strand': strand,
                                                     'subject_name': subject_name}
-            elif strand != reads_alignments_info[read_name]["strand"] and not exclude_potential_chimeras:
+            elif strand != reads_alignments_info[read_name]["strand"] and exclude_potential_chimeras:
                 reads_alignments_info.pop(read_name)
     return reads_alignments_info    
 
