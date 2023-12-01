@@ -163,8 +163,8 @@ def group_reads_of_same_insertion(insertion_reads, organelle_boundaires=1000):
         for group in groups:
             if not groups:
                 break
-            group_start = median(group['insertion_starts'])
-            group_end = median(group['insertion_ends'])
+            group_start = min(group['insertion_starts'])
+            group_end = max(group['insertion_ends'])
             group_organelle_start = min(group['organelle_starts'])
             group_organelle_end = max(group['organelle_ends'])
             if value["chrom"] == group["nuclear"]:
