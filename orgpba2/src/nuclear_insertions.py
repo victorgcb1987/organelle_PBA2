@@ -147,7 +147,7 @@ def exclude_reads_with_less_coverage(organelles_alignments_info, exclude_alignme
     return alignments_info
 
 
-def group_reads_of_same_insertion(insertion_reads, organelle_boundaires=100):
+def group_reads_of_same_insertion(insertion_reads, organelle_boundaires=1000):
     # insertions_positions[name] = {'insertion_starts' : joined_groups_starts, 
     #                               'insertion_ends' : joined_groups_end,
     #                                'organelle_start' : p_start_organ, 
