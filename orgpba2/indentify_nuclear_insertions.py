@@ -10,7 +10,7 @@ from src.nuclear_insertions import (get_reads_alignments_info, calculate_reads_q
                                     select_reads_by_coverage, filter_reads_by_name, write_seqs_from_seqs_id,
                                     get_insertions_positions, exclude_reads_with_less_coverage, remove_organelle_offset,
                                     group_reads_of_same_insertion)
-from src.seqs import (calculate_repeats_regions, concate_reference_genome)
+from src.seqs import concate_reference_genome
 
 
 def parse_arguments():
@@ -113,7 +113,7 @@ def main():
             exclude_alignments = run_minimap2_for_insertions(arguments, assembly="exclude")["output_file"]
 
     with open(organelle_alignments) as alignments_fhand:
-        organelle_alignments_info = get_reads_alignments_info(alignments_fhand, repeats)
+        organelle_alignments_info = get_reads_alignments_info(alignments_fhand, repeats=repeats)
         organelle_alignments_info = remove_organelle_offset(organelle_alignments_info, arguments['organelle_length'])
         if arguments["exclude_assembly"]:
             with open(exclude_alignments) as alignments_fhand:
