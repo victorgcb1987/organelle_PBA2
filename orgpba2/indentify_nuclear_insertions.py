@@ -152,7 +152,7 @@ def main():
             organelle_starts = str(round(median(insertion["organelle_starts"])))
             organelle_ends = str(round(median(insertion["organelle_ends"])))
             nupt_length = str(round(median(insertion["organelle_ends"])) - round(median(insertion["organelle_starts"])))
-            num_reads = len(round(insertion["readnames"]))
+            num_reads = len(insertion["readnames"])
             readnames = ",".join(insertion["readnames"])
             results_fhand.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(chrom, nuclear_start, nuclear_end, organelle_starts, organelle_ends, nupt_length, num_reads, readnames))
             results_fhand.flush()
