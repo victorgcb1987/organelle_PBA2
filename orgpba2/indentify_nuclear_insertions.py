@@ -100,6 +100,7 @@ def main():
     reference_fpath = arguments["organelle_assembly"]
     breakpoints = find_blocks_breakpoints(arguments["organelle_assembly"], arguments)
     print(breakpoints)
+    exit()
     #concate_reference_genome(reference_fpath, output_dir)
 
     organelle_alignments = arguments["out_dir"] / out_dir["minimap2"] /  "mappings_against_organelle.paf"
