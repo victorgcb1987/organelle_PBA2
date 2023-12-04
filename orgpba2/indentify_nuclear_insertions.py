@@ -4,11 +4,13 @@ from statistics import median
 from sys import argv
 
 from src.config import OUTPUT_FOLDERS as out_dir
+from src.heteroplasmy import find_blocks_breakpoints
 from src.minimap2 import run_minimap2_for_insertions
 from src.nuclear_insertions import (get_reads_alignments_info, calculate_reads_query_coverage, 
                                     select_reads_by_coverage, filter_reads_by_name, write_seqs_from_seqs_id,
                                     get_insertions_positions, exclude_reads_with_less_coverage, remove_organelle_offset,
                                     group_reads_of_same_insertion)
+from src.seqs import (calculate_repeats_regions, concate_reference_genome)
 
 
 def parse_arguments():
@@ -95,6 +97,10 @@ def main():
     arguments = get_options()
     if not arguments["out_dir"].exists():
         arguments["out_dir"].mkdir(parents=True)
+    reference_fpath = arguments["organelle_assembly"]
+    breakpoints = find_blocks_breakpoints(arguments["organelle_assembly"], arguments)
+    print(breakpoints)
+    #concate_reference_genome(reference_fpath, output_dir)
 
     organelle_alignments = arguments["out_dir"] / out_dir["minimap2"] /  "mappings_against_organelle.paf"
     arguments["alignment_fpath"] = organelle_alignments
@@ -142,12 +148,12 @@ def main():
         results_fhand.write("#CHROM_ID\tNUCLEAR_START\tNUCLEAR_END\tORGANELLE_START\tORGANELLE_END\tINSERTION_LENGTH\tNUM_READS\tREADS_ID\n")
         for insertion in insertions:
             chrom = insertion["nuclear"]
-            nuclear_start = str(median(insertion["insertion_starts"]))
-            nuclear_end = str(median(insertion["insertion_ends"]))
-            organelle_starts = str(median(insertion["organelle_starts"]))
-            organelle_ends = str(median(insertion["organelle_ends"]))
-            nupt_length = str(median(insertion["organelle_ends"]) - median(insertion["organelle_starts"]))
-            num_reads = len(insertion["readnames"])
+            nuclear_start = str(round(median(insertion["insertion_starts"])))
+            nuclear_end = str(round(median(insertion["insertion_ends"])))
+            organelle_starts = str(round(median(insertion["organelle_starts"])))
+            organelle_ends = str(round(median(insertion["organelle_ends"])))
+            nupt_length = str(round(median(insertion["organelle_ends"])) - round(median(insertion["organelle_starts"])))
+            num_reads = len(round(insertion["readnames"]))
             readnames = ",".join(insertion["readnames"])
             results_fhand.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(chrom, nuclear_start, nuclear_end, organelle_starts, organelle_ends, nupt_length, num_reads, readnames))
             results_fhand.flush()
