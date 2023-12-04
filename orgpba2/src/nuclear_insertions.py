@@ -12,7 +12,10 @@ from subprocess import run
 
 def get_reads_alignments_info(reads_fhand, repeats=False, exclude_potential_chimeras=True):
 #Get info of diferent reads from an archive in paf format
-    offset = repeats[1][0] - repeats[0][0]
+    if repeats:
+        offset = repeats[1][0] - repeats[0][0]
+    else:
+        offset = False
     reads_alignments_info = {}
     for line in reads_fhand:
         if line:
@@ -28,7 +31,7 @@ def get_reads_alignments_info(reads_fhand, repeats=False, exclude_potential_chim
             query_start = int(line[2])
             query_end = int(line[3])
             strand = line[4]
-            if repeats:
+            if offset:
                 if subject_start >= repeats[1][0] and subject_end <= repeats[1][1]:
                     subject_start = subject_start - offset
                     subject_end = subject_end - offset
