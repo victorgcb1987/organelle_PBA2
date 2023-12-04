@@ -97,9 +97,10 @@ def main():
     arguments = get_options()
     if not arguments["out_dir"].exists():
         arguments["out_dir"].mkdir(parents=True)
-    reference_fpath = arguments["organelle_assembly"]
-    breakpoints = find_blocks_breakpoints(arguments["organelle_assembly"], arguments)
-    print(breakpoints)
+    breakpoints, colinear = find_blocks_breakpoints(arguments["organelle_assembly"], arguments)
+    repeats = [(breakpoints["LSC_IRa"], breakpoints["IRa_SSC"]), (breakpoints["SSC_IRb"], breakpoints["IRb_LSC"])]
+    print(repeats)
+    print(colinear)
     exit()
     #concate_reference_genome(reference_fpath, output_dir)
 
