@@ -38,8 +38,8 @@ def get_reads_alignments_info(reads_fhand, organelle_length=0, repeats=False, ex
             if offset:
                 print(subject_start, subject_end)
                 if subject_start >= repeats[1][0] and subject_end <= repeats[1][1]:
-                    subject_start = subject_start - offset
-                    subject_end = subject_end - offset
+                    subject_start = (subject_start - repeats[1][0]) + repeats[0][0]
+                    subject_end = (repeats[1][1] - subject_end) - repeats[0][1] 
                     print("YES", subject_start, subject_end)
             total_alignment =  int(line[3]) - int(line[2])  
             if read_name not in reads_alignments_info:
