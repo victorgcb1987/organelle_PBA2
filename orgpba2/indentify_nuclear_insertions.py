@@ -101,7 +101,7 @@ def main():
     repeats = [(breakpoints["LSC_IRa"], breakpoints["IRa_SSC"]), (breakpoints["SSC_IRb"], breakpoints["IRb_LSC"])]
     print(repeats)
     print(colinear)
-    arguments["nuclear_assembly"] = concate_reference_genome(arguments["nuclear_assembly"], arguments["out_dir"])
+    arguments["nuclear_assembly"] = concate_reference_genome(arguments["organelle_assembly"], arguments["out_dir"])
     exit()
 
     organelle_alignments = arguments["out_dir"] / out_dir["minimap2"] /  "mappings_against_organelle.paf"
