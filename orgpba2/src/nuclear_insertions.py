@@ -10,8 +10,9 @@ from src.utils import file_exists
 from subprocess import run
 
 
-def get_reads_alignments_info(reads_fhand, exclude_potential_chimeras=True):
+def get_reads_alignments_info(reads_fhand, repeats, exclude_potential_chimeras=True):
 #Get info of diferent reads from an archive in paf format
+    offset = repeats[1][0] - repeats[0][0]
     reads_alignments_info = {}
     for line in reads_fhand:
         if line:
@@ -27,6 +28,9 @@ def get_reads_alignments_info(reads_fhand, exclude_potential_chimeras=True):
             query_start = int(line[2])
             query_end = int(line[3])
             strand = line[4]
+            if subject_start >= repeats[1][0] and subject_end <= repeats[1][1]:
+                subject_start = subject_start - offset
+                subject_end = subject_end - offset
             total_alignment =  int(line[3]) - int(line[2])  
             if read_name not in reads_alignments_info:
                 reads_alignments_info[read_name] = {'length' : read_length, 
@@ -147,7 +151,7 @@ def exclude_reads_with_less_coverage(organelles_alignments_info, exclude_alignme
     return alignments_info
 
 
-def group_reads_of_same_insertion(insertion_reads, organelle_boundaires=1000):
+def group_reads_of_same_insertion(insertion_reads, organelle_boundaires=500):
     # insertions_positions[name] = {'insertion_starts' : joined_groups_starts, 
     #                               'insertion_ends' : joined_groups_end,
     #                                'organelle_start' : p_start_organ, 
@@ -168,7 +172,7 @@ def group_reads_of_same_insertion(insertion_reads, organelle_boundaires=1000):
             group_organelle_start = min(group['organelle_starts'])
             group_organelle_end = max(group['organelle_ends'])
             if value["chrom"] == group["nuclear"]:
-                if  abs(value['organelle_start'] - group_organelle_start) <= organelle_boundaires or abs(value['organelle_end'] - group_organelle_end) <= organelle_boundaires:
+                if abs(value['organelle_start'] - group_organelle_start) <= organelle_boundaires or abs(value['organelle_end'] - group_organelle_end) <= organelle_boundaires:
                     if abs(value['insertion_start'] - group_start) <= organelle_boundaires or abs(value['insertion_end'] - group_end) <= organelle_boundaires:
                         group['readnames'].append(key)
                         group["insertion_starts"].append(value['insertion_start'])
@@ -177,7 +181,7 @@ def group_reads_of_same_insertion(insertion_reads, organelle_boundaires=1000):
                         group["organelle_ends"].append(value["organelle_end"])
                         group_found = True
                         break
-    
+
     # Si no se encontró ningún grupo que se solape, crear uno nuevo
         if not group_found:
             groups.append({
