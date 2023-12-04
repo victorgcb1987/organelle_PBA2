@@ -99,10 +99,7 @@ def main():
         arguments["out_dir"].mkdir(parents=True)
     breakpoints, colinear = find_blocks_breakpoints(arguments["organelle_assembly"], arguments)
     repeats = [(breakpoints["LSC_IRa"], breakpoints["IRa_SSC"]), (breakpoints["SSC_IRb"], breakpoints["IRb_LSC"])]
-    print(repeats)
-    print(colinear)
     arguments["nuclear_assembly"] = concate_reference_genome(arguments["organelle_assembly"], arguments["out_dir"])
-    exit()
 
     organelle_alignments = arguments["out_dir"] / out_dir["minimap2"] /  "mappings_against_organelle.paf"
     arguments["alignment_fpath"] = organelle_alignments
@@ -116,7 +113,7 @@ def main():
             exclude_alignments = run_minimap2_for_insertions(arguments, assembly="exclude")["output_file"]
 
     with open(organelle_alignments) as alignments_fhand:
-        organelle_alignments_info = get_reads_alignments_info(alignments_fhand)
+        organelle_alignments_info = get_reads_alignments_info(alignments_fhand, repeats)
         organelle_alignments_info = remove_organelle_offset(organelle_alignments_info, arguments['organelle_length'])
         if arguments["exclude_assembly"]:
             with open(exclude_alignments) as alignments_fhand:
