@@ -36,6 +36,7 @@ def get_reads_alignments_info(reads_fhand, organelle_length=0, repeats=False, ex
                     print("YES", subject_start, subject_end)
                     subject_start = repeats[0][0] + (organelle_length - subject_end)
                     subject_end =  subject_start + insertion_length
+                    print("Modified", subject_start, subject_end)
             total_alignment =  int(line[3]) - int(line[2])  
             if read_name not in reads_alignments_info:
                 reads_alignments_info[read_name] = {'length' : read_length, 
