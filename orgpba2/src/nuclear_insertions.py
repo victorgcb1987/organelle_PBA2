@@ -12,11 +12,6 @@ from subprocess import run
 
 def get_reads_alignments_info(reads_fhand, organelle_length=0, repeats=False, exclude_potential_chimeras=True):
 #Get info of diferent reads from an archive in paf format
-    if repeats:
-        offset = repeats[1][0] - repeats[0][0]
-    else:
-        offset = False
-    print(offset)
     reads_alignments_info = {}
     for line in reads_fhand:
         if line:
@@ -35,12 +30,11 @@ def get_reads_alignments_info(reads_fhand, organelle_length=0, repeats=False, ex
             if subject_start >= organelle_length and subject_end >= organelle_length:
                 subject_start = subject_start - organelle_length
                 subject_end = subject_end - organelle_length
-            if offset:
-                print(subject_start, subject_end)
-                if subject_start >= repeats[1][0] and subject_end <= repeats[1][1]:
-                    subject_start = (subject_start - repeats[1][0]) + repeats[0][0]
-                    subject_end =  repeats[0][1] - (repeats[1][1] - subject_end) 
-                    print("YES", subject_start, subject_end)
+            if repeats:
+                insertion_length = abs(subject_end - subject_start)
+                if subject_start >= repeats[1][0] and subject_end <= repeats[1][1] and strand == "+":
+                    subject_start = repeats[0][0] + (organelle_length - subject_end)
+                    subject_end =  subject_start + insertion_length
             total_alignment =  int(line[3]) - int(line[2])  
             if read_name not in reads_alignments_info:
                 reads_alignments_info[read_name] = {'length' : read_length, 
