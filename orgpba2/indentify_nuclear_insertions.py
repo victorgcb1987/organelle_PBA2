@@ -99,7 +99,6 @@ def main():
         arguments["out_dir"].mkdir(parents=True)
     breakpoints, colinear = find_blocks_breakpoints(arguments["organelle_assembly"], arguments)
     repeats = [(breakpoints["LSC_IRa"], breakpoints["IRa_SSC"]), (breakpoints["SSC_IRb"], breakpoints["IRb_LSC"])]
-    arguments["nuclear_assembly"] = concate_reference_genome(arguments["organelle_assembly"], arguments["out_dir"])
 
     organelle_alignments = arguments["out_dir"] / out_dir["minimap2"] /  "mappings_against_organelle.paf"
     arguments["alignment_fpath"] = organelle_alignments
