@@ -32,11 +32,13 @@ def get_reads_alignments_info(reads_fhand, organelle_length=0, repeats=False, ex
                 subject_end = subject_end - organelle_length
             if repeats:
                 insertion_length = abs(subject_end - subject_start)
-                if subject_start >= repeats[1][0] and subject_end <= repeats[1][1] and strand == "+":
-                    print("YES", subject_start, subject_end, "+")
-                    subject_start = repeats[0][0] + (organelle_length - subject_end)
-                    subject_end =  subject_start + insertion_length
-                    print("Modified", subject_start, subject_end)
+                if subject_start >= repeats[1][0] and subject_end <= repeats[1][1]:
+                    if strand == "+":
+                        subject_start = repeats[0][0] + (organelle_length - subject_end)
+                        subject_end =  subject_start + insertion_length
+                    else:
+                        print(subject_start, subject_end)
+                
             total_alignment =  int(line[3]) - int(line[2])  
             if read_name not in reads_alignments_info:
                 reads_alignments_info[read_name] = {'length' : read_length, 
