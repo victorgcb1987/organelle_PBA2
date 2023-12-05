@@ -33,7 +33,7 @@ def get_reads_alignments_info(reads_fhand, organelle_length=0, repeats=False, ex
             if repeats:
                 insertion_length = abs(subject_end - subject_start)
                 if subject_start >= repeats[1][0] and subject_end <= repeats[1][1] and strand == "+":
-                    print("YES", subject_start, subject_end)
+                    print("YES", subject_start, subject_end, "+")
                     subject_start = repeats[0][0] + (organelle_length - subject_end)
                     subject_end =  subject_start + insertion_length
                     print("Modified", subject_start, subject_end)
