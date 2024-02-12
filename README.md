@@ -34,4 +34,13 @@ export BLAST_PATH="/Path/to/executable/"
 export RACON_PATH="/Path/to/executable/"
 ```
 
+# Installation
+
+Althought optional, It's strongly advised to install this program using a python virtualenv.
+
+```
+git clone https://github.com/victorgcb1987/organelle_PBA2.git
+cd organelle_pba
+python setup.py install
+```
 
