@@ -44,3 +44,8 @@ cd organelle_pba
 python setup.py install
 ```
 
+# Usage
+This suite have three programs that can be used:
+
+## Organelle assmebly
+
