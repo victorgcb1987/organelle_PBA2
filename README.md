@@ -6,6 +6,8 @@ The following software is required in order to run Organelle_PBA2:
 
 Python3
 Biopython (https://biopython.org/wiki/Download)
+
+
 BLAST suite (https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastDocs&DOC_TYPE=Download)
 FiltLong (https://github.com/rrwick/Filtlong)
 Canu (https://github.com/marbl/canu)
