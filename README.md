@@ -54,3 +54,7 @@ python /organelle_PBA2/orgpba2/assemble_organelle.py --reference {reference_geno
 --threads {num_threads} --technology {pacbio|pacbio-hifi|nanopore}  --subsample_coverage {coverage} /
 --out {output_dir} --curate_assembly
 ```
+Plastid/Mitchondria reference genome (--reference), long reads dataset (--sequence) and output dir (--out) are the only arguments required to run the assembly.
+Command above shows the typical calling of this program but there is other optional arguments that can be declared, like specifiying how minimap2, filtlong or 
+canu options (--minimap2, --canu_options, -filtlong_options).
+
