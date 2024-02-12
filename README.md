@@ -22,6 +22,10 @@ Minimap2 (https://github.com/lh3/minimap2)
 
 Racon (https://github.com/isovic/racon)
 
-Organelle_PBA2 is designed to either check $PATH enviroment variable for the exectuables needed to run
+Organelle_PBA2 is designed to either check $PATH enviroment variable for the exectuables needed to run, but custom paths to executables can be defined like this
+
+```
+sassa
+```
 
 
