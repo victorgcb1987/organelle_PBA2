@@ -58,3 +58,12 @@ Plastid/Mitchondria reference genome (--reference), long reads dataset (--sequen
 Command above shows the typical calling of this program but there is other optional arguments that can be declared, like specifiying how minimap2, filtlong or 
 canu options (--minimap2, --canu_options, -filtlong_options).
 
+Assemble organelle stores each step required in order to run the assembly in it's own folder, so following rerunnings of this programs skips already done steps.
+You can force to redo each step declaring the following, optional arguments when rerunning the program:
+```
+--force_mapping
+--force_extract_mapped_reads
+--force_assembly
+--force_subsampling
+```
+
