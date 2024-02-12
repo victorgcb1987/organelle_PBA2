@@ -4,7 +4,7 @@ Organelle PBA2 is a organelle genome assembler using Third Generation sequencing
 
 The following software is required in order to run Organelle_PBA2:
 
-Requirements
+# Requirements
 
 Python3
 
