@@ -51,5 +51,6 @@ This suite have three programs that can be used:
 
 ```
 python /organelle_PBA2/orgpba2/assemble_organelle.py --reference {reference_genome.fasta}  --sequence {reads.fq.gz} /
---threads {num_threads} --technology {pacbio|pacbio-hifi|nanopore}  --subsample_coverage {coverage} --out {output_dir} --curate_assembly
+--threads {num_threads} --technology {pacbio|pacbio-hifi|nanopore}  --subsample_coverage {coverage} /
+--out {output_dir} --curate_assembly
 ```
