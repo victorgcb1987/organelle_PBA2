@@ -25,7 +25,13 @@ Racon (https://github.com/isovic/racon)
 Organelle_PBA2 is designed to either check $PATH enviroment variable for the exectuables needed to run, but custom paths to executables can be defined like this
 
 ```
-sassa
+export MINIMAP2_PATH="/Path/to/executable/"
+export NUCMER_PATH="/Path/to/executable/"
+export FILTLONG_PATH="/Path/to/executable/"
+export SEQTK_PATH="/Path/to/executable/"
+export CANU_PATH="/Path/to/executable/"
+export BLAST_PATH="/Path/to/executable/"
+export RACON_PATH="/Path/to/executable/"
 ```
 
 
