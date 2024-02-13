@@ -88,4 +88,4 @@ python indentify_nuclear_insertions.py --nuclear_assembly {nuclear_reference.fas
 
 The --exclude argument it's optional. When declared, reads mapped against the organelle assembly will 
 also be mapped against the assembly provided with this option and all reads with higher number of nucleotides
-aligned against this will be excluded from the analysis.
+aligned against this will be excluded from the analysis. The --length argument is for the organelle to analyze nucleotide length.
