@@ -58,6 +58,8 @@ Plastid/Mitchondria reference genome (--reference), long reads dataset (--sequen
 Command above shows the typical calling of this program but there is other optional arguments that can be declared, like specifiying how minimap2, filtlong or 
 canu options (--minimap2, --canu_options, -filtlong_options).
 
+The --curate_assembly will try to curate the assembly by homology against the refence genome provided in the command call, so it's advisable to use a reference genome from the same genus.
+
 Assemble organelle stores each step required in order to run the assembly in it's own folder, so following rerunnings of this programs skips already done steps.
 You can force to redo each step declaring the following, optional arguments when rerunning the program:
 ```
@@ -67,3 +69,9 @@ You can force to redo each step declaring the following, optional arguments when
 --force_subsampling
 ```
 
+# Calculate heteroplasmy
+
+```
+python calculate_heteroplasmy.py --assembly {reference_genome.fasta} --sequences {reads.fq.gz} --out {output_dir} /
+--threads {num_threads}  --technology {pacbio|pacbio-hifi|nanopore}
+```
