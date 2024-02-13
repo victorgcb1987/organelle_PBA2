@@ -69,9 +69,19 @@ You can force to redo each step declaring the following, optional arguments when
 --force_subsampling
 ```
 
-# Calculate heteroplasmy
+## Calculate heteroplasmy
 
 ```
 python calculate_heteroplasmy.py --assembly {reference_genome.fasta} --sequences {reads.fq.gz} --out {output_dir} /
 --threads {num_threads}  --technology {pacbio|pacbio-hifi|nanopore}
+```
+
+
+## NUPTs detection
+
+```
+python indentify_nuclear_insertions.py --nuclear_assembly {nuclear_reference.fasta} \
+--organelle_assembly {organelle_assembly.fasta} --exclude {organelle_to_compare.fasta} \
+--technology {pacbio|pacbio-hifi|nanopore}  --threads {num_threads} \
+--sequences {reads.fq.gz} --length {int} --out {out_dir}
 ```
