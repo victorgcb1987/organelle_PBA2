@@ -85,3 +85,7 @@ python indentify_nuclear_insertions.py --nuclear_assembly {nuclear_reference.fas
 --technology {pacbio|pacbio-hifi|nanopore}  --threads {num_threads} \
 --sequences {reads.fq.gz} --length {int} --out {out_dir}
 ```
+
+The --exclude argument it's optional. When declared, reads mapped against the organelle assembly will 
+also be mapped against the assembly provided with this option and all reads with higher number of nucleotides
+aligned against this will be excluded from the analysis.
