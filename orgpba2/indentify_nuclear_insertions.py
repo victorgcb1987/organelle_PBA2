@@ -113,7 +113,7 @@ def main():
 
     with open(organelle_alignments) as alignments_fhand:
         organelle_alignments_info = get_reads_alignments_info(alignments_fhand, organelle_length=arguments["organelle_length"], repeats=repeats)
-        organelle_alignments_info = remove_organelle_offset(organelle_alignments_info, arguments['organelle_length'])
+        #organelle_alignments_info = remove_organelle_offset(organelle_alignments_info, arguments['organelle_length'])
         if arguments["exclude_assembly"]:
             with open(exclude_alignments) as alignments_fhand:
                 exclude_alignments_info = get_reads_alignments_info(alignments_fhand, exclude_potential_chimeras=False)
