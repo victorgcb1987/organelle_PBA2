@@ -193,7 +193,9 @@ def group_reads_of_same_insertion(insertion_reads):
                         group["organelle_starts"].append(valueB["organelle_start"])
                         group["organelle_ends"].append(valueB["organelle_end"])
                         grouped_readNames.append(keyB)
+                        readNames.remove(keyB)
         groups.append(group)
+        readNames.remove(keyA)
                     
         if len(readNames) == 1:
             insertion = insertion_reads[readNames][0]
