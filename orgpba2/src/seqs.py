@@ -525,7 +525,6 @@ def write_circular_region(redundant_seq_fpath, circularity, output_fpath):
         out_fhand.flush()
 
 def concate_reference_genome(reference_fpath, output_dir):
-    print(out_dir)
     concatenated_fpath = output_dir / "concatenated_reference.fasta"
     record = SeqIO.read(reference_fpath, "fasta")
     concatenated_sequence = str(record.seq) + str(record.seq)

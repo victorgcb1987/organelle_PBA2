@@ -174,8 +174,6 @@ def retrieve_not_overlapping_coordinates_from_contigs(contig_with_largest_ir, nu
                 group = list(map(int,group))
                 ranges.append((group[0]+1, group[-1]))
             regions_without_overlapping[contig] = ranges
-    print(regions_without_overlapping)
-    print(contig_with_largest_ir['contig_position'][0])
      #Aqui hay varias posibilidades:
     #1 Los contigs no tienen solapamiento, de modo que tienen el mismo tamaño
     #2 No hay solapamiento, pero la detección del ir se ha hecho con una especie distante y por lo tanto la longitud detectada es menor
@@ -187,18 +185,15 @@ def retrieve_not_overlapping_coordinates_from_contigs(contig_with_largest_ir, nu
         ir_detected_length = abs(contig_with_largest_ir['contig_position'][0] - contig_with_largest_ir['contig_position'][1])
         if not_overlapping_contig_length < ir_detected_length :
             regions_without_overlapping[contig_with_largest_ir["contig_name"]] = [(contig_with_largest_ir['contig_position'][0], contig_with_largest_ir['contig_position'][-1])]
-    print("Not overlapping", regions_without_overlapping)
     return regions_without_overlapping
 
 def write_not_overlapping_regions(options, not_overlapping_regions):
     asssembled_contigs_fpath = options["out_dir"] / out_dir["flye"] / outfile["assembly"]
     contigs_without_overlaps = options["out_dir"] / out_dir["curated_assembly"] / outfile["contigs_without_overlaps"]
-    print(contigs_without_overlaps)
     assembly_input = SeqIO.index(str(asssembled_contigs_fpath), "fasta")
     with open(str(contigs_without_overlaps), "w") as out_fhand:
         for contig, regions in not_overlapping_regions.items():
             for region in regions:
-                print(regions)
                 if len(regions) == 1:
                     subseq = assembly_input[contig][region[0]-1:region[-1]]
                     subseq.id = "{}_{}-{}".format(contig, region[0], region[-1])
@@ -256,8 +251,6 @@ def orient_and_concatenate_contigs(options, nucmer_output, min_identity=90):
                     matches.append(match)
                 elif query_id != matches[-1]["contig"]:
                     matches.append(match)
-
-    print("XXXXXXX", matches)
 
     contigs = SeqIO.index(str(contigs_fpath), "fasta")
     with open(str(concatenated_out_fpath), "w") as out_fhand:

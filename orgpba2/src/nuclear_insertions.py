@@ -54,6 +54,7 @@ def get_reads_alignments_info(reads_fhand, organelle_length=0, repeats=False, ex
                 reads_alignments_info.pop(read_name)
     return reads_alignments_info    
 
+
 def calculate_reads_query_coverage(alignments_info):
 #Calculate reads query coverage (aligned part respect total)
     coverages = {}
@@ -63,12 +64,14 @@ def calculate_reads_query_coverage(alignments_info):
         coverages[read] = coverage
     return coverages
 
+
 def select_reads_by_coverage(reads_coverage, coverage_cutoff = 0.9, mode="under"):
 #Obtain reads that their query coverage is under a determinate acceptation value
     if mode == "under":
         return [read_name for read_name, coverage in reads_coverage.items() if coverage <= coverage_cutoff]
     elif mode == "over":
         return [read_name for read_name, coverage in reads_coverage.items() if coverage >= coverage_cutoff]
+
 
 def filter_reads_by_name(alignments_info, readnames):
     return {readname: alignments_info[readname] for readname in readnames}
@@ -159,7 +162,7 @@ def exclude_reads_with_less_coverage(organelles_alignments_info, exclude_alignme
     return alignments_info
 
 
-def group_reads_of_same_insertion(insertion_reads, organelle_boundaires=1000):
+def group_reads_of_same_insertion(insertion_reads, organelle_boundaires=10):
     # insertions_positions[name] = {'insertion_starts' : joined_groups_starts, 
     #                               'insertion_ends' : joined_groups_end,
     #                                'organelle_start' : p_start_organ, 

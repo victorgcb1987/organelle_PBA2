@@ -152,7 +152,6 @@ def run_minimap2_for_insertions(options, assembly=""):
         results = results = {"output_file": output_fpath,
                              "return_code": 0,
                              "log_messages": "File already exists"}
-        print(results)
         return results
     # if assembly == "organelle" or assembly == "exclude":
     #     cmd.append("-cx asm20")
@@ -178,7 +177,5 @@ def run_minimap2_for_insertions(options, assembly=""):
     results = {"output_file": output_fpath,
                "return_code": minimap2_run.returncode,
                "log_messages": minimap2_run.stderr.decode()}
-    print(cmd)
-    print(results)
     return results
 
