@@ -184,8 +184,8 @@ def group_reads_of_same_insertion(insertion_reads):
                 if valueA["chrom"] != valueB["chrom"]:
                     continue
                 else:
-                    rangeA = [valueA["insertion_starts"], valueA["insertion_ends"]]
-                    rangeB = [valueB["insertion_starts"], valueB["insertion_ends"]]
+                    rangeA = [valueA["insertion_start"], valueA["insertion_end"]]
+                    rangeB = [valueB["insertion_start"], valueB["insertion_end"]]
                     if getOverlap(rangeA, rangeB):
                         group['readnames'].append(keyB)
                         group["insertion_starts"].append(valueB['insertion_start'])
