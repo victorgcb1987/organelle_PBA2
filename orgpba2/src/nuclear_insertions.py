@@ -166,7 +166,7 @@ def getOverlap(a, b):
 def group_reads_of_same_insertion(insertion_reads):
     groups = []
     readNames = [readName for readName in insertion_reads.keys()]
-    print(readNames)
+    readNames.remove('ERR6210723.21')
     grouped_readNames = []
     copied_insertion_reads = insertion_reads.copy()
     while readNames:
