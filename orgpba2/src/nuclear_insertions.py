@@ -169,7 +169,7 @@ def group_reads_of_same_insertion(insertion_reads):
     grouped_readNames = []
     copied_insertion_reads = insertion_reads.copy()
     while readNames:
-        print(len(readNames))
+        print(len(grouped_readNames))
         init = True
         for read in grouped_readNames:
             copied_insertion_reads.pop(read)
@@ -191,7 +191,6 @@ def group_reads_of_same_insertion(insertion_reads):
                     rangeA = [valueA["insertion_start"], valueA["insertion_end"]]
                     rangeB = [valueB["insertion_start"], valueB["insertion_end"]]
                     if getOverlap(rangeA, rangeB):
-                        print(keyA, keyB, getOverlap(rangeA, rangeB))
                         group['readnames'].append(keyB)
                         group["insertion_starts"].append(valueB['insertion_start'])
                         group["insertion_ends"].append(valueB["insertion_end"])
