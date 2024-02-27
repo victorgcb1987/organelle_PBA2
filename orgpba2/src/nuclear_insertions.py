@@ -169,44 +169,32 @@ def group_reads_of_same_insertion(insertion_reads):
     grouped_readNames = []
     copied_insertion_reads = insertion_reads.copy()
     init = True
-    while readNames:
-        print(len(readNames))
-        for keyA, valueA in copied_insertion_reads.items():
-            if init:
-                group = {"readnames": [keyA], "insertion_starts": [valueA['insertion_start']],
-                         "insertion_ends": [valueA["insertion_end"]],
-                         "organelle_starts": [valueA["organelle_start"]],
-                         "organelle_ends": [valueA["organelle_end"]]}
-                init = False
-                grouped_readNames.append(keyA)
-                readNames.remove(keyA)
-            for keyB, valueB in copied_insertion_reads.items():
-                if valueA["chrom"] != valueB["chrom"] or keyA == keyB:
-                    continue
-                else:
-                    rangeA = [valueA["insertion_start"], valueA["insertion_end"]]
-                    rangeB = [valueB["insertion_start"], valueB["insertion_end"]]
-                    if getOverlap(rangeA, rangeB):
-                        group['readnames'].append(keyB)
-                        group["insertion_starts"].append(valueB['insertion_start'])
-                        group["insertion_ends"].append(valueB["insertion_end"])
-                        group["organelle_starts"].append(valueB["organelle_start"])
-                        group["organelle_ends"].append(valueB["organelle_end"])
-                        grouped_readNames.append(keyB)
-                        readNames.remove(keyB)
-            groups.append(group)
-            init = True
-            for read in grouped_readNames:
-                copied_insertion_reads.pop(read)
-            grouped_readNames = []
-                    
-        if len(readNames) == 1:
-            insertion = insertion_reads[readNames][0]
-            groups.append([{"readnames": [readNames[0]], "insertion_starts": [insertion['insertion_start']],
-                            "insertion_ends": [insertion["insertion_end"]],
-                            "organelle_starts": [insertion["organelle_start"]],
-                            "organelle_ends": [insertion["organelle_end"]]}])
-            readNames = []
+    for keyA, valueA in copied_insertion_reads.items():
+        if keyA in grouped_readNames:
+            continue
+        if init:
+            group = {"readnames": [keyA], "insertion_starts": [valueA['insertion_start']],
+                     "insertion_ends": [valueA["insertion_end"]],
+                     "organelle_starts": [valueA["organelle_start"]],
+                     "organelle_ends": [valueA["organelle_end"]]}
+            init = False
+            grouped_readNames.append(keyA)
+        for keyB, valueB in copied_insertion_reads.items():
+            if valueA["chrom"] != valueB["chrom"] or keyA == keyB or keyB in grouped_readNames:
+                continue
+            else:
+                rangeA = [valueA["insertion_start"], valueA["insertion_end"]]
+                rangeB = [valueB["insertion_start"], valueB["insertion_end"]]
+                if getOverlap(rangeA, rangeB):
+                    group['readnames'].append(keyB)
+                    group["insertion_starts"].append(valueB['insertion_start'])
+                    group["insertion_ends"].append(valueB["insertion_end"])
+                    group["organelle_starts"].append(valueB["organelle_start"])
+                    group["organelle_ends"].append(valueB["organelle_end"])
+                    grouped_readNames.append(keyB)
+                    readNames.remove(keyB)
+        groups.append(group)
+        init = True            
     return groups
 
 # def group_reads_of_same_insertion(insertion_reads, organelle_boundaires=10):
