@@ -176,7 +176,8 @@ def group_reads_of_same_insertion(insertion_reads):
             group = {"readnames": [keyA], "insertion_starts": [valueA['insertion_start']],
                      "insertion_ends": [valueA["insertion_end"]],
                      "organelle_starts": [valueA["organelle_start"]],
-                     "organelle_ends": [valueA["organelle_end"]]}
+                     "organelle_ends": [valueA["organelle_end"]],
+                     'nuclear': valueA["chrom"]}
             init = False
             grouped_readNames.append(keyA)
         for keyB, valueB in copied_insertion_reads.items():
