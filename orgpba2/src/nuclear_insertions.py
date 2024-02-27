@@ -166,6 +166,7 @@ def getOverlap(a, b):
 def group_reads_of_same_insertion(insertion_reads):
     groups = []
     readNames = [readName for readName in insertion_reads.keys()]
+    print(readNames)
     grouped_readNames = []
     while readNames:
         print(len(readNames))
