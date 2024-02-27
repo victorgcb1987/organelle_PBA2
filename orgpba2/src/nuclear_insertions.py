@@ -195,7 +195,6 @@ def group_reads_of_same_insertion(insertion_reads):
                         grouped_readNames.append(keyB)
                         readNames.remove(keyB)
             groups.append(group)
-            readNames.remove(keyA)
             init = True
             for read in grouped_readNames:
                 copied_insertion_reads.pop(read)
