@@ -183,6 +183,7 @@ def group_reads_of_same_insertion(insertion_reads):
                          "organelle_starts": [valueA["organelle_start"]],
                          "organelle_ends": [valueA["organelle_end"]]}
                 init = False
+                readNames.remove(keyA)
                 continue
             for keyB, valueB in copied_insertion_reads.items():
                 if valueA["chrom"] != valueB["chrom"] or keyA == keyB:
