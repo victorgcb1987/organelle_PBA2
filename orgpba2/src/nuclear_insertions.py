@@ -181,7 +181,7 @@ def group_reads_of_same_insertion(insertion_reads):
                          "organelle_ends": [valueA["organelle_end"]]}
                 init = False
             for keyB, valueB in insertion_reads.items():
-                if valueA["chrom"] != valueB["chrom"]:
+                if valueA["chrom"] != valueB["chrom"] or keyA == keyB:
                     continue
                 else:
                     rangeA = [valueA["insertion_start"], valueA["insertion_end"]]
