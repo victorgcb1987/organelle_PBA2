@@ -166,16 +166,16 @@ def getOverlap(a, b):
 def group_reads_of_same_insertion(insertion_reads):
     groups = []
     readNames = [readName for readName in insertion_reads.keys()]
-    print(readNames)
     grouped_readNames = []
+    copied_insertion_reads = insertion_reads.copy()
     while readNames:
         print(len(readNames))
         init = True
         for read in grouped_readNames:
-            if read in insertion_reads:
-                insertion_reads.pop(read)
+            if read in copied_insertion_reads:
+                copied_insertion_reads.pop(read)
         grouped_readNames = []
-        for keyA, valueA in insertion_reads.items():
+        for keyA, valueA in copied_insertion_reads.items():
             if init:
                 grouped_readNames.append(keyA)
                 group = {"readnames": [keyA], "insertion_starts": [valueA['insertion_start']],
@@ -183,7 +183,8 @@ def group_reads_of_same_insertion(insertion_reads):
                          "organelle_starts": [valueA["organelle_start"]],
                          "organelle_ends": [valueA["organelle_end"]]}
                 init = False
-            for keyB, valueB in insertion_reads.items():
+                continue
+            for keyB, valueB in copied_insertion_reads.items():
                 if valueA["chrom"] != valueB["chrom"] or keyA == keyB:
                     continue
                 else:
