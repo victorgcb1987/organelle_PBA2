@@ -145,6 +145,7 @@ def main():
         results_fhand.write("#{}".format(" ".join(argv)))
         results_fhand.write("#CHROM_ID\tNUCLEAR_START\tNUCLEAR_END\tORGANELLE_START\tORGANELLE_END\tINSERTION_LENGTH\tNUM_READS\tREADS_ID\n")
         for insertion in insertions:
+            print(insertion)
             chrom = insertion["nuclear"]
             nuclear_start = str(round(median(insertion["insertion_starts"])))
             nuclear_end = str(round(median(insertion["insertion_ends"])))
@@ -155,10 +156,6 @@ def main():
             readnames = ",".join(insertion["readnames"])
             results_fhand.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(chrom, nuclear_start, nuclear_end, organelle_starts, organelle_ends, nupt_length, num_reads, readnames))
             results_fhand.flush()
-
-
-
-        
 
     #nuclear_alignments = run_minimap2_for_insertions(arguments, organelle=False)
 
