@@ -36,8 +36,6 @@ def get_reads_alignments_info(reads_fhand, organelle_length=0, repeats=False, ex
                     if strand == "+":
                         subject_start = repeats[0][0] + (organelle_length - subject_end)
                         subject_end =  subject_start + insertion_length
-                    else:
-                        print(subject_start, subject_end)
                 
             total_alignment =  int(line[3]) - int(line[2])  
             if read_name not in reads_alignments_info:
@@ -161,46 +159,90 @@ def exclude_reads_with_less_coverage(organelles_alignments_info, exclude_alignme
             alignments_info[read_name] = values
     return alignments_info
 
+def getOverlap(a, b):
+    return max(0, min(a[1], b[1]) - max(a[0], b[0]))
 
-def group_reads_of_same_insertion(insertion_reads, organelle_boundaires=10):
-    # insertions_positions[name] = {'insertion_starts' : joined_groups_starts, 
-    #                               'insertion_ends' : joined_groups_end,
-    #                                'organelle_start' : p_start_organ, 
-    #                                'organelle_end' : p_end_organ,
-    #                                'nuclear' : chrom,
-    #                                'reads' : list_reads}
+
+def group_reads_of_same_insertion(insertion_reads):
     groups = []
-    # Recorrer el diccionario original y agrupar los valores de 'name' según si las regiones se solapan o no
-    for key, value in insertion_reads.items():
-        group_found = False
-    
-    # Buscar si existe algún grupo que se solape con esta entrada
-        for group in groups:
-            if not groups:
-                break
-            group_start = min(group['insertion_starts'])
-            group_end = max(group['insertion_ends'])
-            group_organelle_start = min(group['organelle_starts'])
-            group_organelle_end = max(group['organelle_ends'])
-            if value["chrom"] == group["nuclear"]:
-                #if abs(value['organelle_start'] - group_organelle_start) <= organelle_boundaires or abs(value['organelle_end'] - group_organelle_end) <= organelle_boundaires:
-                if abs(value['insertion_start'] - group_start) <= organelle_boundaires or abs(value['insertion_end'] - group_end) <= organelle_boundaires:
-                    group['readnames'].append(key)
-                    group["insertion_starts"].append(value['insertion_start'])
-                    group["insertion_ends"].append(value["insertion_end"])
-                    group["organelle_starts"].append(value["organelle_start"])
-                    group["organelle_ends"].append(value["organelle_end"])
-                    group_found = True
-                    break
-
-    # Si no se encontró ningún grupo que se solape, crear uno nuevo
-        if not group_found:
-            groups.append({
-                'organelle_starts': [value['organelle_start']],
-                'organelle_ends': [value['organelle_end']],
-                'readnames': [key],
-                'nuclear': value["chrom"],
-                'insertion_starts': [value["insertion_start"]],
-                'insertion_ends': [value["insertion_end"]]
-            })
+    readNames = [readName for readName in insertion_reads.keys()]
+    while readNames:
+        grouped_readNames = []
+        init = True
+        for read in grouped_readNames:
+            if read in insertion_reads:
+                insertion_reads.pop(read)
+        for keyA, valueA in insertion_reads.items():
+            if init:
+                grouped_readNames.append(keyA)
+                group = {"readnames": [keyA], "insertion_starts": [valueA['insertion_start']],
+                         "insertion_ends": [valueA["insertion_end"]],
+                         "organelle_starts": [valueA["organelle_start"]],
+                         "organelle_ends": [valueA["organelle_end"]]}
+                init = False
+            for keyB, valueB in insertion_reads.items():
+                if valueA["chrom"] != valueB["chrom"]:
+                    continue
+                else:
+                    rangeA = [valueA["insertion_starts"], valueA["insertion_ends"]]
+                    rangeB = [valueB["insertion_starts"], valueB["insertion_ends"]]
+                    if getOverlap(rangeA, rangeB):
+                        group['readnames'].append(keyB)
+                        group["insertion_starts"].append(valueB['insertion_start'])
+                        group["insertion_ends"].append(valueB["insertion_end"])
+                        group["organelle_starts"].append(valueB["organelle_start"])
+                        group["organelle_ends"].append(valueB["organelle_end"])
+                        grouped_readNames.append(keyB)
+        groups.append(group)
+                    
+        if len(readNames) == 1:
+            insertion = insertion_reads[readNames][0]
+            groups.append([{"readnames": [readNames[0]], "insertion_starts": [insertion['insertion_start']],
+                            "insertion_ends": [insertion["insertion_end"]],
+                            "organelle_starts": [insertion["organelle_start"]],
+                            "organelle_ends": [insertion["organelle_end"]]}])
+            readNames = []
     return groups
+
+# def group_reads_of_same_insertion(insertion_reads, organelle_boundaires=10):
+#     # insertions_positions[name] = {'insertion_starts' : joined_groups_starts, 
+#     #                               'insertion_ends' : joined_groups_end,
+#     #                                'organelle_start' : p_start_organ, 
+#     #                                'organelle_end' : p_end_organ,
+#     #                                'nuclear' : chrom,
+#     #                                'reads' : list_reads}
+#     groups = []
+#     # Recorrer el diccionario original y agrupar los valores de 'name' según si las regiones se solapan o no
+#     for key, value in insertion_reads.items():
+#         group_found = False
+    
+#     # Buscar si existe algún grupo que se solape con esta entrada
+#         for group in groups:
+#             if not groups:
+#                 break
+#             group_start = min(group['insertion_starts'])
+#             group_end = max(group['insertion_ends'])
+#             group_organelle_start = min(group['organelle_starts'])
+#             group_organelle_end = max(group['organelle_ends'])
+#             if value["chrom"] == group["nuclear"]:
+#                 #if abs(value['organelle_start'] - group_organelle_start) <= organelle_boundaires or abs(value['organelle_end'] - group_organelle_end) <= organelle_boundaires:
+#                 if abs(value['insertion_start'] - group_start) <= organelle_boundaires or abs(value['insertion_end'] - group_end) <= organelle_boundaires:
+#                     group['readnames'].append(key)
+#                     group["insertion_starts"].append(value['insertion_start'])
+#                     group["insertion_ends"].append(value["insertion_end"])
+#                     group["organelle_starts"].append(value["organelle_start"])
+#                     group["organelle_ends"].append(value["organelle_end"])
+#                     group_found = True
+#                     break
+
+#     # Si no se encontró ningún grupo que se solape, crear uno nuevo
+#         if not group_found:
+#             groups.append({
+#                 'organelle_starts': [value['organelle_start']],
+#                 'organelle_ends': [value['organelle_end']],
+#                 'readnames': [key],
+#                 'nuclear': value["chrom"],
+#                 'insertion_starts': [value["insertion_start"]],
+#                 'insertion_ends': [value["insertion_end"]]
+#             })
+#     return groups
