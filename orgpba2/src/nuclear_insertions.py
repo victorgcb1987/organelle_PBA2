@@ -168,11 +168,11 @@ def group_reads_of_same_insertion(insertion_reads):
     readNames = [readName for readName in insertion_reads.keys()]
     while readNames:
         print(len(readNames))
-        grouped_readNames = []
         init = True
         for read in grouped_readNames:
             if read in insertion_reads:
                 insertion_reads.pop(read)
+        grouped_readNames = []
         for keyA, valueA in insertion_reads.items():
             if init:
                 grouped_readNames.append(keyA)
@@ -194,8 +194,6 @@ def group_reads_of_same_insertion(insertion_reads):
                         group["organelle_starts"].append(valueB["organelle_start"])
                         group["organelle_ends"].append(valueB["organelle_end"])
                         grouped_readNames.append(keyB)
-                        print(grouped_readNames)
-                        print(readNames)
                         readNames.remove(keyB)
         groups.append(group)
         readNames.remove(keyA)
