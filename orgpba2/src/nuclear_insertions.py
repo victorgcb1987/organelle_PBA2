@@ -168,6 +168,7 @@ def group_reads_of_same_insertion(insertion_reads):
     readNames = [readName for readName in insertion_reads.keys()]
     grouped_readNames = []
     copied_insertion_reads = insertion_reads.copy()
+    init = True
     while readNames:
         print(len(readNames))
         for keyA, valueA in copied_insertion_reads.items():
