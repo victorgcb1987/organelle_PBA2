@@ -172,20 +172,20 @@ def group_reads_of_same_insertion(insertion_reads):
         print(len(readNames))
         init = True
         for read in grouped_readNames:
-            if read in copied_insertion_reads:
-                copied_insertion_reads.pop(read)
+            copied_insertion_reads.pop(read)
         grouped_readNames = []
         for keyA, valueA in copied_insertion_reads.items():
             if init:
-                grouped_readNames.append(keyA)
                 group = {"readnames": [keyA], "insertion_starts": [valueA['insertion_start']],
                          "insertion_ends": [valueA["insertion_end"]],
                          "organelle_starts": [valueA["organelle_start"]],
                          "organelle_ends": [valueA["organelle_end"]]}
                 init = False
+                grouped_readNames.append(keyA)
                 readNames.remove(keyA)
                 continue
             for keyB, valueB in copied_insertion_reads.items():
+                print(keyB)
                 if valueA["chrom"] != valueB["chrom"] or keyA == keyB:
                     continue
                 else:
