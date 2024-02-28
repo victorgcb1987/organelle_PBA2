@@ -10,8 +10,9 @@ from src.utils import file_exists
 from subprocess import run
 
 
-def get_reads_alignments_info(reads_fhand, organelle_length=0, repeats=False, exclude_potential_chimeras=True):
+def get_reads_alignments_info(reads_fhand, organelle_length=0, repeats=False, exclude_potential_chimeras=False):
 #Get info of diferent reads from an archive in paf format
+    reads_processed = []
     reads_alignments_info = {}
     for line in reads_fhand:
         if line:
@@ -27,6 +28,8 @@ def get_reads_alignments_info(reads_fhand, organelle_length=0, repeats=False, ex
             query_start = int(line[2])
             query_end = int(line[3])
             strand = line[4]
+            reads_processed.append(read_name)
+            read_name = "{}_{}".format(read_name, str(reads_processed.count(read_name)))
             if subject_start >= organelle_length and subject_end >= organelle_length:
                 subject_start = subject_start - organelle_length
                 subject_end = subject_end - organelle_length
