@@ -30,6 +30,7 @@ def get_reads_alignments_info(reads_fhand, organelle_length=0, repeats=False, ex
             strand = line[4]
             reads_processed.append(read_name)
             read_name = "{}_{}".format(read_name, str(reads_processed.count(read_name)))
+            print(read_name)
             if subject_start >= organelle_length and subject_end >= organelle_length:
                 subject_start = subject_start - organelle_length
                 subject_end = subject_end - organelle_length
@@ -82,6 +83,7 @@ def write_seqs_from_seqs_id(seq_ids, seqs_pool, seqs_out_fpath, overwrite=False)
     #Extract reads mapped to reference genome
     seqtk_exectuable = get_executables(exec_reqs["seqtk"])
     seqs_ids_fhand = NamedTemporaryFile()
+    seq_ids = [seq_id.split("_")[0] for seq_id in seq_ids]
     seqs_ids_fhand.write("\n".join(seq_ids).encode())
     seqs_ids_fhand.flush()
     if not file_exists(seqs_out_fpath) or overwrite:
