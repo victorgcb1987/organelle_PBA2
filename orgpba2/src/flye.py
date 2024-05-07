@@ -39,19 +39,19 @@ def run_flye(options, overwrite=False):
         raise RuntimeError("Unsuported sequencing technlogy: {}".format(options["sequence_technology"]))
     cmd.append(str(options["seqs_input"]))
     cmd.append("--genome-size {}".format(options["genome_size"]))
-    if additional_arguments:
-        for argument, value in additional_arguments.items():
-            if argument == "min-overlap":
-                cmd.append("--min-overlap {}".format(value))
-            if argument == "read_error":
-                cmd.append("--read_error {}".format(value))
-            if argument == "scaffold":
-                cmd.append("--scaffold")
-            if argument == "i" or argument == "iterations":
-                cmd.append("--iterations {}".format(value))
-            if argument == "asm-coverage":
-                cmd.append("--asm-coverage {}".format(value))
-    cmd.append("-t {}".format(options["number_threads"]))
+    # if additional_arguments:
+    #     for argument, value in additional_arguments.items():
+    #         if argument == "min-overlap":
+    #             cmd.append("--min-overlap {}".format(value))
+    #         if argument == "read_error":
+    #             cmd.append("--read_error {}".format(value))
+    #         if argument == "scaffold":
+    #             cmd.append("--scaffold")
+    #         if argument == "i" or argument == "iterations":
+    #             cmd.append("--iterations {}".format(value))
+    #         if argument == "asm-coverage":
+    #             cmd.append("--asm-coverage {}".format(value))
+    cmd.append("-t {} --scaffold --iterations 3".format(options["number_threads"]))
     cmd.append("--out-dir {}".format(str(run_flye_dir)))
     #running flye
     print(" ".join(cmd))
