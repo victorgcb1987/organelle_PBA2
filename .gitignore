@@ -1,0 +1,8 @@
+
+/.VSCodeCounter
+/.vscode
+/build/lib/orgpba2
+/dist
+/OPBA2.egg-info
+orgpba2/.DS_Store
+/orgpba2/src/__pycache__
