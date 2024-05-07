@@ -23,7 +23,7 @@ def run_flye(options, overwrite=False):
                        "log_messages": msg.format(str(run_flye_dir))}
             return results
     #Init required variables
-    additional_arguments = options["flye_options"]
+    #additional_arguments = options["flye_options"]
     #Check whether flye executable is in user env
     #or path and start minimap's run command adding it
     flye_executable = get_executables(exec_reqs["flye"])
