@@ -14,12 +14,8 @@ EXECUTABLES_REQUIREMENTS = {"minimap2": {"executable": "minimap2",
                                      "user_path": "CANU_PATH"},
                             "filtlong": {"executable": "filtlong",
                                      "user_path": "FILTLONG_PATH"},
-                            "racon": {"executable": "racon",
-                                      "user_path": "RACON_PATH"},
                             "nucmer": {"executable": "nucmer",
-                                      "user_path": "NUCMER_PATH"},
-                            "flye": {"executable": "flye",
-                                      "user_path": "FLYE_PATH"}}
+                                      "user_path": "NUCMER_PATH"}}
 
 MAGIC_NUMS_COMPRESSED = [b'\x1f\x8b\x08', b'\x42\x5a\x68', 
                          b'\x50\x4b\x03\x04']
@@ -29,7 +25,6 @@ OUTPUT_FOLDERS = {"haplotypes": "07_haplotypes",
                   "mapped_seqs": "02_mapped_seqs_seqtk_filtlong",
                   "subsampled_seqs": "02_mapped_seqs_seqtk_filtlong",
                   "canu": "03_assembly_canu",
-                  "flye": "03_assembly_flye",
                   "blast_db": "00_blasts",
                   "polished_assembly": "04_polished_assembly_racon",
                   "curated_assembly": "06_curated_assembly_mummer",

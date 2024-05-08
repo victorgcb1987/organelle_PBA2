@@ -285,6 +285,7 @@ def main():
     log_fhand.write(canu_results["log_messages"])
     log_fhand.flush()
     check_results(msg, canu_results)
+    options["assembly_fpath"] = canu_results["output_files"]
     options["assembly_fpath"] =  options["assembly_fpath"] / "03_assembled.contigs.fasta"
 
     # Polishing with racon
