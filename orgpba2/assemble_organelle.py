@@ -10,7 +10,7 @@ from Bio import SeqIO
 
 from src.utils import file_exists, folder_exists
 
-from src.flye import run_flye
+from src.canu import run_canu
 from src.config  import EXECUTABLES_REQUIREMENTS, OUTPUT_FILENAMES
 from src.config import OUTPUT_FOLDERS as out_dir
 from src.curation import run_nucmer, get_genomic_coordinates_from_assembly, create_curated_genome
@@ -69,10 +69,10 @@ def parse_arguments():
     help_force_assembly = "(Optional) Force assembly if it is already done. By default skips this step"
     parser.add_argument("--force_assembly", "-fa", action='store_true',
                         help=help_force_assembly)
-    help_flye_options = "(Optional) User flye options. None by default"
-    parser.add_argument("--flye_options", 
+    help_canu_options = "(Optional) User canu options. None by default"
+    parser.add_argument("--canu_options", 
                         type=str, default="",
-                        help=help_flye_options)
+                        help=help_canu_options)
     help_subsample = "(Optional) Subsample number of mapped reads to desired coverage using filtlong with quality priority set to 10. By default is 0 (subsampling skipped)"
     parser.add_argument("--subsample_coverage", "-sc",
                         type=int,
@@ -120,10 +120,10 @@ def get_options():
     num_polishing_iterations = options.polishing_iterations
     calculate_heteroplasmy = options.heteroplasmy
     curate_assembly = options.curate_assembly
-    if options.flye_options:
-        flye_options = parse_executable_options(options.flye_options)
+    if options.canu_options:
+        canu_options = parse_executable_options(options.canu_options)
     else:
-        flye_options = ""
+        canu_options = ""
     if options.racon:
         racon_options = parse_executable_options(options.racon)
     else:
@@ -137,12 +137,12 @@ def get_options():
             'force_mapping': force_mapping,
             'force_extract_mapped_reads': force_extract_mapped_reads,
             'sequence_technology': sequence_technology,
-            'force_flye': force_assembly,
+            'force_canu': force_assembly,
             'desired_coverage': desired_coverage,
             'filtlong': filtlong_options,
             'force_subsampling': force_subsampling,
             'polishing_iterations': num_polishing_iterations,
-            'flye_additional_options': flye_options,
+            'canu_additional_options': canu_options,
             'racon_additional_options': racon_options,
             'calculate_heteroplasmy': calculate_heteroplasmy,
             'curate_assembly': curate_assembly}
@@ -275,17 +275,17 @@ def main():
             log_fhand.write(msg)
             log_fhand.flush()
 
-    # Assembly perfomance with flye
-    msg = "Step 3: asssemble contigs with flye\n"
+    # Assembly perfomance with canu
+    msg = "Step 3: asssemble contigs with canu\n"
     print(msg)
     log_fhand.write(msg)
     log_fhand.flush()
-    #flye_results = run_flye(options)
-    flye_results = run_flye(options)
-    log_fhand.write(flye_results["log_messages"])
+    #canu_results = run_canu(options)
+    canu_results = run_canu(options)
+    log_fhand.write(canu_results["log_messages"])
     log_fhand.flush()
-    check_results(msg, flye_results)
-    options["assembly_fpath"] = flye_results["output_files"]
+    check_results(msg, canu_results)
+    options["assembly_fpath"] = canu_results["output_files"]
     #options["assembly_fpath"] =  options["assembly_fpath"] / "03_assembled.contigs.fasta"
 
     # Polishing with racon
